@@ -1,0 +1,280 @@
+﻿package "net.exiva.quicktwit"
+
+interface "{source}net/exiva/quicktwit/Resources.java"
+events "{source}net/exiva/quicktwit/Commands.java"
+
+#
+## Application Strings
+#
+string ID_APP_NAME "quickTwit"
+string ID_APP_CLASS "net.exiva.quicktwit.quickTwit"
+string ID_APP_FLAGS "LC"
+string ID_LOCALE "en_US"
+
+#
+## Images
+#
+bitmap ID_MARQUEE "{base}ID_MARQUEE.png"
+bitmap ID_PING_MARQUEE "{base}ID_PINGFM_MARQUEE.png"
+bitmap ID_TWITPIC_ICON "{base}TwitPicIcon.png"
+bitmap ID_EGG "{base}ID_EGG.png"
+
+#
+## Text Strings
+#
+string kRsrc_dialogTitle "What are you doing?"
+string kRsrc_twitterTitle "Configure twitter"
+string kRsrc_pfmKeyTitle "Configure ping.fm"
+string kRsrc_presetTitle "Edit Presets"
+string kRsrc_errorTitle "quickTwit Error"
+string kRsrc_postButton "Post"
+string kRsrc_doneButton "Done"
+string kRsrc_cancelButton "Cancel"
+string kRsrc_userLabel "Username:"
+string kRsrc_passLabel "Password:"
+string kRsrc_appKeyLabel "Mobile Key:"
+string kRsrc_preset1Label "Message 1"
+string kRsrc_preset2Label "Message 2"
+string kRsrc_preset3Label "Message 3"
+string kRsrc_errorText "No message was entered."
+string ID_AUTH_FAIL "Could not authenticate you."
+string ID_TWITTERED "Twitter'd!"
+string ID_PINGD "Ping'd!"
+string ID_FAIL "Something is technically wrong."
+string ID_TWITTER_DOWN "Twitter's down. Try again later."
+string ID_QUEUED "Message queued."
+
+# #
+# ## quickTwit dialog
+# #
+# dialog ID_QUICKTWIT
+# 	title = kRsrc_dialogTitle
+# 	systemDialog
+# 	# icon = ID_MARQUEE
+# 	widthPct = 90
+# 	# overrideMaxWidth
+# 	button
+# 		position = buttonTop1
+# 		event = EVENT_CANCEL
+# 		title = "Cancel"
+# 		shortcut = cancelButton
+# 		id = ID_CANCEL_BUTTON
+# 	button
+# 		position = buttonBottom1
+# 		event = EVENT_SEND_TWITTER
+# 		title = kRsrc_postButton
+# 		shortcut = backButton
+# 		id = ID_POST_BUTTON
+# 	button
+# 		position = buttonBottom3
+# 		event = EVENT_TWITPIC
+# 		title = "TwitPic"
+# 		shortcut = rightShoulderButton
+# 		id = ID_PHOTO_BUTTON
+# 	button
+# 		position = buttonBottom2
+# 		event = EVENT_SHRINK
+# 		title = "TweetShrink"
+# 		id = ID_SHRINK_BUTTON
+# 	textField
+# 		top = 0
+# 		left = 0
+# 		fillToRight = 0
+# 		# position = top
+# 		maxLength = 140
+# 		autoText		
+# 		id = ID_TWIT_TEXT
+# endDialog
+
+
+#
+## quickTwit dialog
+#
+textInputAlert ID_QUICKTWIT
+	title = kRsrc_dialogTitle
+	systemDialog
+	icon = ID_MARQUEE
+	overrideMaxWidth
+	button
+		position = buttonBottom1
+		event = EVENT_SEND_TWITTER
+		title = kRsrc_postButton
+		shortcut = backButton
+		id = ID_POST_BUTTON
+	button
+		position = buttonBottom2
+		event = EVENT_SHRINK
+		title = "TweetShrink"
+		id = ID_SHRINK_BUTTON
+	button
+		position = buttonBottom3
+		event = EVENT_TWITPIC
+		title = "TwitPic"
+		shortcut = rightShoulderButton
+		id = ID_PHOTO_BUTTON
+	textField
+		position = top
+		maxLength = 140
+		autoText		
+		id = ID_TWIT_TEXT
+endTextInputAlert
+
+#
+## twitter Configuration
+#
+textInputAlert ID_TWITTER_LOGIN
+	title = kRsrc_twitterTitle
+	icon = noteIcon
+	systemDialog
+	button
+		position = buttonBottom1
+		event = EVENT_STORE_TWITTER_LOGIN
+		title = kRsrc_doneButton
+		shortcut = backButton
+		id = ID_STORE_BUTTON
+		defaultButton
+	button
+		position = buttonTop1
+		title = kRsrc_cancelButton
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+	textField
+		position = top
+		title = kRsrc_userLabel
+		id = ID_TWITTER_USERNAME
+	textField
+		position = top
+		title = kRsrc_passLabel
+		passwordField
+		id = ID_TWITTER_PASSWORD
+endTextInputAlert
+
+#
+## ping.fm Configuration
+#
+textInputAlert ID_PINGFM_LOGIN
+	title = kRsrc_pfmKeyTitle
+	icon = noteIcon
+	systemDialog
+	button
+		position = buttonBottom1
+		event = EVENT_STORE_PINGFM_KEY
+		title = kRsrc_doneButton
+		shortcut = backButton
+		id = ID_STORE_BUTTON
+		defaultButton
+	button
+		position = buttonBottom3
+		event = EVENT_OPEN_KEY_PAGE
+		title = "Get Key"
+		id = ID_KEY_BUTTON
+	button
+		position = buttonTop1
+		title = kRsrc_cancelButton
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+	
+	textField
+		position = top
+		title = kRsrc_appKeyLabel
+		id = ID_PINGFM_KEY
+endTextInputAlert
+
+#
+## Preset Messages Dialog
+#
+textInputAlert ID_PRESETS
+	title = kRsrc_presetTitle
+	icon = noteIcon
+	systemDialog
+	button 			
+		position = buttonBottom1
+		event = EVENT_STORE_PRESETS
+		title = kRsrc_doneButton
+		shortcut = backButton
+		id = ID_STORE_PRESETS
+		defaultButton
+	button
+		position = buttonTop1
+		title = kRsrc_cancelButton
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+ 	textField		
+		position = top
+		title = kRsrc_preset1Label
+		maxLength = 140
+		autoText
+		id = ID_MESSAGE_1
+	textField		
+		position = top
+		title = kRsrc_preset2Label
+		maxLength = 140
+		autoText
+		id = ID_MESSAGE_2
+	textField		
+		position = top
+		title = kRsrc_preset3Label
+		maxLength = 140
+		autoText
+		id = ID_MESSAGE_3
+endTextInputAlert
+
+#
+## Image Chooser type Alert
+#
+alert chooserAlert
+	title = "TwitPic"
+	icon = ID_TWITPIC_ICON
+	systemDialog
+	text = "Take Photo or Choose Existing Photo?"
+	button
+		position = buttonTop1
+		title = "Cancel"
+		shortcut = cancelButton
+		event = EVENT_CHOOSER_BACK
+	button
+		position = buttonBottom1
+		title = "Choose Photo"
+		shortcut = backButton
+		event = EVENT_CHOOSE_PHOTO
+		defaultButton
+	button 
+		position = buttonBottom2
+		title = "Take Photo"
+		event = EVENT_TAKE_PHOTO
+endAlert
+
+
+#
+## Send Image Alert
+#
+alert warningAlert
+	title = "Send TwitPic?"
+	icon = stopIcon
+	systemDialog
+	text = "Send this TwitPic without text?\nThe photo will not be posted to your twitter timeline."
+	button
+		position = buttonBottom1
+		title = "Back"
+		shortcut = backButton
+		event = EVENT_WARNING_BACK
+		defaultButton
+	button 
+		position = buttonBottom2
+		title = "Choose Photo"
+		event = EVENT_OPEN_ALERT
+endAlert
+
+#
+## Error Alert
+#
+alert ID_TWITTER_ERROR
+	title = kRsrc_errorTitle
+	autoDismissMilliseconds = 4000
+	systemDialog
+	sleepScreenMessage = kRsrc_errorText
+	text = kRsrc_errorText
+endAlert
