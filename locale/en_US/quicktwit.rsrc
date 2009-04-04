@@ -1,0 +1,145 @@
+﻿package "net.exiva.quicktwit"
+interface "{source}net/exiva/quicktwit/Resources.java"
+events "{source}net/exiva/quicktwit/Commands.java"
+
+#
+## Application Strings
+#
+string ID_APP_NAME "quickTwit"
+string ID_APP_CLASS "net.exiva.quicktwit.quickTwit"
+string ID_APP_FLAGS "LC"
+string ID_LOCALE "en_US"
+
+#
+## quickTwit dialog
+#
+textInputAlert ID_QUICKTWIT
+	title = "What are you doing?"
+	systemDialog
+	overrideMaxWidth
+	button
+		position = buttonBottom1
+		event = EVENT_SEND_TWITTER
+		title = "Post"
+		shortcut = backButton
+		id = ID_POST_BUTTON
+	textField
+		position = top
+		maxLength = 140
+		autoText
+		id = ID_TWIT_TEXT
+endTextInputAlert
+
+alert ID_QUICKTWIT
+	title = "testing..."
+	text = "Alert Testing..."
+	systemDialog
+endAlert
+
+#
+## twitter Configuration
+#
+textInputAlert ID_TWITTER_LOGIN
+	title = "Configure twitter"
+	icon = noteIcon
+	systemDialog
+	button
+		position = buttonBottom1
+		event = EVENT_STORE_TWITTER_LOGIN
+		title = "Done"
+		shortcut = backButton
+		id = ID_STORE_BUTTON
+		defaultButton
+	button
+		position = buttonTop1
+		title = "Cancel"
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+	textField
+		position = top
+		title = "Username:"
+		id = ID_TWITTER_USERNAME
+	textField
+		position = top
+		title = "Password:"
+		passwordField
+		id = ID_TWITTER_PASSWORD
+endTextInputAlert
+
+#
+## ping.fm Configuration
+#
+textInputAlert ID_PINGFM_LOGIN
+	title = "Configure ping.fm"
+	icon = noteIcon
+	systemDialog
+	button
+		position = buttonBottom1
+		event = EVENT_STORE_PINGFM_KEY
+		title = "Done"
+		shortcut = backButton
+		id = ID_STORE_BUTTON
+		defaultButton
+	button
+		position = buttonTop1
+		title = "Cancel"
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+	textField
+		position = top
+		title = "App Key:"
+		id = ID_PINGFM_KEY
+endTextInputAlert
+
+#
+## Preset Messages Dialog
+#
+textInputAlert ID_PRESETS
+	title = "Edit quickTwit Presets"
+	icon = noteIcon
+	systemDialog
+	button 			
+		position = buttonBottom1
+		event = EVENT_STORE_PRESETS
+		title = "Done"
+		shortcut = backButton
+		id = ID_STORE_PRESETS
+		defaultButton
+	button
+		position = buttonTop1
+		title = "Cancel"
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+ 	textField		
+		position = top
+		title = "Message 1"
+		maxLength = 140
+		autoText
+		id = ID_MESSAGE_1
+	textField		
+		position = top
+		title = "Message 2"
+		maxLength = 140
+		autoText
+		id = ID_MESSAGE_2
+	textField		
+		position = top
+		title = "Message 3"
+		maxLength = 140
+		autoText
+		id = ID_MESSAGE_3
+endTextInputAlert
+
+#
+## Error Alert
+#
+alert ID_TWITTER_ERROR
+	title = "quickTwit Error"
+	autoDismissMilliseconds = 4000
+	systemDialog
+	sleepScreenMessage = "No message was entered."
+	text = "No message was entered."
+endAlert
