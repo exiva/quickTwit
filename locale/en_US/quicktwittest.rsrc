@@ -1,0 +1,17 @@
+﻿package "net.exiva.quicktwittest"
+
+interface "{source}net/exiva/quicktwittest/Resources.java"
+events "{source}net/exiva/quicktwittest/Commands.java"
+
+#
+## Application Strings
+#
+string ID_APP_NAME "quickTwitLauncher"
+string ID_APP_CLASS "net.exiva.quicktwittest.quicktwittest"
+string ID_VERSION "v@APP_VERSION_MAJOR@.@APP_VERSION_MINOR@/@APP_VERSION_BUILD@"
+string ID_LOCALE "en_US"
+
+#
+## Bitmaps
+#
+bitmap ID_MARQUEE "{base}Marquee.png"
