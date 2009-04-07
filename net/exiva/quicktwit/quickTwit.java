@@ -148,7 +148,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		String command = message.toUpperCase();
 		if ("?SYSMON".equals(command)) {
 			IPCMessage sysMon = new IPCMessage();
-			sysMon.addItem("what", 1234);
+			sysMon.addItem("foo", "bar");
 			Registrar.sendMessage("batteryIcon", sysMon, null);
 			clearText();
 		} else if ("?HELP".equals(command)) {
