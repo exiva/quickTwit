@@ -76,6 +76,7 @@ public class quickTwit extends Application implements Resources, Commands {
 
 	public quickTwit() {
 		Registrar.registerProvider("quickTwit", this, 0);
+		Registrar.registerProvider("url.http", this, 2, Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE), "quickTwit", 'T');
 		quickTwit = Application.getCurrentApp().getResources().getTextInputAlert(ID_QUICKTWIT, this);
 		// quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
 		login = Application.getCurrentApp().getResources().getTextInputAlert(ID_TWITTER_LOGIN, this);
