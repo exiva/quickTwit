@@ -73,7 +73,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	// DialogWindow quickTwit;
 	AlertWindow chooser, error, pictureWarning;
 	Button twitPic;
-	MarqueeAlert mTwitterMarquee, mPingMarquee;
+	MarqueeAlert mPingMarquee, mTwitterMarquee, mTrimMarquee;
 	TextField bodyField;
 	TextInputAlertWindow login,pingfm,presets,quickTwit,trim;
 
@@ -91,6 +91,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		presets = Application.getCurrentApp().getResources().getTextInputAlert(ID_PRESETS, this);
 		mTwitterMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE),1);
 		mPingMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_PING_MARQUEE),1);
+		mTrimMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_TRIM_MARQUEE),1);
 		bodyField = (TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
 		// twitButton = (Button)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
 		twitPic = (Button)quickTwit.getDescendantWithID(ID_PHOTO_BUTTON);
@@ -125,8 +126,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			}
 			username = qtPrefs.getStringValue("username");
 			password = qtPrefs.getStringValue("password");
-			trim_username = qtPrefs.getStringValue("trim.username");
-			trim_password = qtPrefs.getStringValue("trim.password");
+			trim_username = qtPrefs.getStringValue("trimusername");
+			trim_password = qtPrefs.getStringValue("trimpassword");
 			pingfmKey = qtPrefs.getStringValue("pingfmkey");
 			preset1 = qtPrefs.getStringValue("preset1");
 			if (preset1==null || "".equals(preset1)) { preset1 = "Wakeup"; }
@@ -612,8 +613,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			case EVENT_STORE_TRIM_LOGIN: {
 				trim_username = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_USERNAME);
 				trim_password = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_PASSWORD);
-				qtPrefs.setStringValue("trim.username", trim_username);
-				qtPrefs.setStringValue("trim.password", trim_password);
+				qtPrefs.setStringValue("trimusername", trim_username);
+				qtPrefs.setStringValue("trimpassword", trim_password);
 				return true;
 			}
 			case EVENT_STORE_PINGFM_KEY: {
@@ -803,8 +804,16 @@ public class quickTwit extends Application implements Resources, Commands {
 			}
 			if (qt.getSequenceID() == 7) {
 				if (qt.getResponse() == 200) {
-					String[] trimmd = qt.getString().split("\n");
-					((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(bodyField.getText()+" "+trimmd[0]);
+					if (!"".equals(qt.getResponse())) { 
+						String[] trimmd = qt.getString().split("\n");
+						if ("".equals(bodyField.getText())) {
+							((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(trimmd[0]);
+						} else {
+							((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(bodyField.getText()+" "+trimmd[0]);
+						}
+						mTrimMarquee.setText(getString(ID_TRIMD));
+						NotificationManager.marqueeAlertNotify(mTrimMarquee);
+					}
 				} else {
 					if (mSound==1) {
 						NotificationManager.playErrorSound();
