@@ -16,7 +16,8 @@ string ID_LOCALE "en_US"
 #
 bitmap ID_MARQUEE "{base}ID_MARQUEE.png"
 bitmap ID_PING_MARQUEE "{base}ID_PINGFM_MARQUEE.png"
-bitmap ID_TWITPIC_ICON "{base}TwitPicIcon.png"
+bitmap ID_TWITPIC_ICON "{base}ID_TWITPIC.png"
+bitmap ID_TRIM_ICON "{base}ID_TRIM.png"
 bitmap ID_EGG "{base}ID_EGG.png"
 
 #
@@ -44,6 +45,7 @@ string ID_PINGD "Ping'd!"
 string ID_FAIL "Something is technically wrong."
 string ID_TWITTER_DOWN "Twitter's down. Try again later."
 string ID_QUEUED "Message queued."
+string ID_TRIMD "URL Tr.immed."
 
 # #
 # ## quickTwit dialog
