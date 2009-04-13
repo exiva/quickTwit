@@ -4,6 +4,7 @@ import danger.app.Application;
 import danger.app.Bundle;
 import danger.app.Event;
 import danger.app.EventType;
+import danger.app.IPCIncoming;
 import danger.app.IPCMessage;
 import danger.app.Registrar;
 import danger.app.SettingsDB;
@@ -39,9 +40,9 @@ import java.net.URLEncoder;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
+// import org.json.JSONArray;
+// import org.json.JSONObject;
+// import org.json.JSONException;
 
 public class quickTwit extends Application implements Resources, Commands {
 	static private Boolean loggedin = false;
@@ -76,7 +77,7 @@ public class quickTwit extends Application implements Resources, Commands {
 
 	public quickTwit() {
 		Registrar.registerProvider("quickTwit", this, 0);
-		Registrar.registerProvider("url.http", this, 2, Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE), "quickTwit", 'T');
+		Registrar.registerProvider("send-via", this, 1, Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE), "quickTwit", 'T');
 		quickTwit = Application.getCurrentApp().getResources().getTextInputAlert(ID_QUICKTWIT, this);
 		// quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
 		login = Application.getCurrentApp().getResources().getTextInputAlert(ID_TWITTER_LOGIN, this);
@@ -529,18 +530,26 @@ public class quickTwit extends Application implements Resources, Commands {
 	// }
 
 	public void parseTweetShrink(String response) {
-		try {
-			// Parse a JSONObject without an array.
-			JSONObject obj = new JSONObject(response);
-			int difference = obj.getInt("difference");
-			String newText = obj.getString("text");
-			mTwitterMarquee.setText("Shrunk tweet by "+difference+" characters");
-			NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-			((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(newText);
-			quickTwit.show();
-			obj=null;
-			newText=null;
-		} catch (JSONException e) {}
+		// try {
+		// 	// Parse a JSONObject without an array.
+		// 	JSONObject obj = new JSONObject(response);
+		// 	int difference = obj.getInt("difference");
+		// 	String newText = obj.getString("text");
+		// 	mTwitterMarquee.setText("Shrunk tweet by "+difference+" characters");
+		// 	NotificationManager.marqueeAlertNotify(mTwitterMarquee);
+		// 	((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(newText);
+		// 	quickTwit.show();
+		// 	obj=null;
+		// 	newText=null;
+		// } catch (JSONException e) {}
+	}
+
+	public void handleMessage(IPCMessage ipcmessage, int i) {
+		switch(i) {
+			case 1:
+				DEBUG.p("Got URL: "+ ipcmessage.findString("body"));
+				break;
+			}
 	}
 
 	public boolean receiveEvent(Event e) {
@@ -567,6 +576,10 @@ public class quickTwit extends Application implements Resources, Commands {
 							}
 							quickTwit.show();
 						}
+						return true;
+					}
+					case 1: {
+						handleMessage(((IPCIncoming)e.argument).getMessage(), e.what);
 						return true;
 					}
 				}
