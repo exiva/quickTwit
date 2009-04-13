@@ -597,6 +597,11 @@ public class quickTwit extends Application implements Resources, Commands {
 				auth(login.getTextFieldValue((IPCMessage) e.argument, ID_TWITTER_USERNAME), login.getTextFieldValue((IPCMessage) e.argument, ID_TWITTER_PASSWORD));
 				return true;
 			}
+			case EVENT_STORE_TRIM_LOGIN: {
+				trim_username = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_USERNAME);
+				trim_password = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_PASSWORD);
+				return true;
+			}
 			case EVENT_STORE_PINGFM_KEY: {
 				getPingKey(pingfm.getTextFieldValue((IPCMessage) e.argument, ID_PINGFM_KEY));
 				return true;
