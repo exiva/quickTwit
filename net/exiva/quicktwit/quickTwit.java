@@ -563,7 +563,6 @@ public class quickTwit extends Application implements Resources, Commands {
 	public void handleMessage(IPCMessage ipcmessage, int i) {
 		switch(i) {
 			case 1:
-				DEBUG.p("Got URL: "+ ipcmessage.findString("body"));
 				trimURL(ipcmessage.findString("body"));
 				break;
 			}
@@ -613,7 +612,6 @@ public class quickTwit extends Application implements Resources, Commands {
 			case EVENT_STORE_TRIM_LOGIN: {
 				trim_username = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_USERNAME);
 				trim_password = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_PASSWORD);
-				DEBUG.p("tr.im Username: "+trim_username+" Password: "+trim_password);
 				return true;
 			}
 			case EVENT_STORE_PINGFM_KEY: {
@@ -803,7 +801,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			}
 			if (qt.getSequenceID() == 7) {
 				if (qt.getResponse() == 200) {
-					DEBUG.p("Trimmed URL: "+qt.getString());
+					String[] trimmd = qt.getString().split("\n");
+					((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(tbodyField.getText()+" "+trimmd[0]);
 				} else {
 					if (mSound==1) {
 						NotificationManager.playErrorSound();
