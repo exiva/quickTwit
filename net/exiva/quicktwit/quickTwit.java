@@ -75,7 +75,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	Button twitPic;
 	MarqueeAlert mTwitterMarquee, mPingMarquee;
 	TextField bodyField;
-	TextInputAlertWindow login,pingfm,presets,quickTwit;
+	TextInputAlertWindow login,pingfm,presets,quickTwit,trim;
 
 	public quickTwit() {
 		Registrar.registerProvider("quickTwit", this, 0);
@@ -84,6 +84,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		// quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
 		login = Application.getCurrentApp().getResources().getTextInputAlert(ID_TWITTER_LOGIN, this);
 		pingfm = Application.getCurrentApp().getResources().getTextInputAlert(ID_PINGFM_LOGIN, this);
+		trim = Application.getCurrentApp().getResources().getTextInputAlert(ID_TRIM_LOGIN, this);
 		error = Application.getCurrentApp().getResources().getAlert(ID_TWITTER_ERROR, this);
 		chooser = Application.getCurrentApp().getResources().getAlert(chooserAlert, this);
 		pictureWarning = Application.getCurrentApp().getResources().getAlert(warningAlert, this);
@@ -167,6 +168,9 @@ public class quickTwit extends Application implements Resources, Commands {
 			clearText();
 		} else if ("?PINGFM".equals(command)) {
 			pingfm.show();
+			clearText();
+		} else if ("?TR.IM".equals(command)) {
+			trim.show();
 			clearText();
 		} else if ("?PRESETS".equals(command)) {
 			presets.show();
@@ -609,6 +613,7 @@ public class quickTwit extends Application implements Resources, Commands {
 			case EVENT_STORE_TRIM_LOGIN: {
 				trim_username = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_USERNAME);
 				trim_password = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_PASSWORD);
+				DEBUG.p("tr.im Username: "+trim_username+" Password: "+trim_password);
 				return true;
 			}
 			case EVENT_STORE_PINGFM_KEY: {
