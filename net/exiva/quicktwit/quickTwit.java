@@ -125,7 +125,7 @@ public class quickTwit extends Application implements Resources, Commands {
 			username = qtPrefs.getStringValue("username");
 			password = qtPrefs.getStringValue("password");
 			trim_username = qtPrefs.getStringValue("trim.username");
-			trim_password = qtPrefs.getStringValue("trim.password")
+			trim_password = qtPrefs.getStringValue("trim.password");
 			pingfmKey = qtPrefs.getStringValue("pingfmkey");
 			preset1 = qtPrefs.getStringValue("preset1");
 			if (preset1==null || "".equals(preset1)) { preset1 = "Wakeup"; }
