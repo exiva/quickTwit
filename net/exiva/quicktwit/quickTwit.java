@@ -321,6 +321,14 @@ public class quickTwit extends Application implements Resources, Commands {
 		HTTPConnection.post("http://tweetshrink.com/shrink", "Authorization: Basic", "text="+message, (short) 0, 6);
 	}
 	
+	public void trimURL(String url) {
+		if ((trim_username == null) || (trim_password == null)) {
+			HTTPConnection.post("http://api.tr.im/api/trim_simple", "Authorization: Basic", "url="+url, (short) 0, 7);
+		} else {
+			HTTPConnection.post("http://api.tr.im/api/trim_simple", "Authorization: Basic", "url="+url+"&username="+trim_username+"&password="+trim_password, (short) 0, 7);
+		}
+	}
+	
 	public void auth(String auuser, String aupass) {
 		twitterLogin = Base64.encode((auuser+":"+aupass).getBytes());
 		HTTPConnection.get("https://"+baseURL+"/account/verify_credentials.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", (short) 0, 3);
@@ -552,6 +560,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		switch(i) {
 			case 1:
 				DEBUG.p("Got URL: "+ ipcmessage.findString("body"));
+				trimURL(ipcmessage.findString("body"));
 				break;
 			}
 	}
@@ -778,6 +787,18 @@ public class quickTwit extends Application implements Resources, Commands {
 			if (qt.getSequenceID() == 6) {
 				if (qt.getResponse() == 200) {
 					parseTweetShrink(qt.getString());
+				} else {
+					if (mSound==1) {
+						NotificationManager.playErrorSound();
+					} if (iMarquee==1) {
+						mTwitterMarquee.setText(getString(ID_FAIL));
+						NotificationManager.marqueeAlertNotify(mPingMarquee);
+					}
+				}
+			}
+			if (qt.getSequenceID() == 7) {
+				if (qt.getResponse() == 200) {
+					DEBUG.p("Trimmed URL: "+qt.getString());
 				} else {
 					if (mSound==1) {
 						NotificationManager.playErrorSound();
