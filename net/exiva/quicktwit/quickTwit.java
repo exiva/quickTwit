@@ -612,6 +612,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			case EVENT_STORE_TRIM_LOGIN: {
 				trim_username = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_USERNAME);
 				trim_password = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_PASSWORD);
+				qtPrefs.setStringValue("trim.username", trim_username);
+				qtPrefs.setStringValue("trim.password", trim_password);
 				return true;
 			}
 			case EVENT_STORE_PINGFM_KEY: {
@@ -802,7 +804,7 @@ public class quickTwit extends Application implements Resources, Commands {
 			if (qt.getSequenceID() == 7) {
 				if (qt.getResponse() == 200) {
 					String[] trimmd = qt.getString().split("\n");
-					((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(tbodyField.getText()+" "+trimmd[0]);
+					((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(bodyField.getText()+" "+trimmd[0]);
 				} else {
 					if (mSound==1) {
 						NotificationManager.playErrorSound();
