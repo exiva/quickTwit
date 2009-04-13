@@ -64,6 +64,8 @@ public class quickTwit extends Application implements Resources, Commands {
 	static private String version = "1.0";
 	static private String tagName;
 	static private String text;
+	static private String trim_password;
+	static private String trim_username;
 	static private String twitterLogin;
 	static private String username;
 	static private Timer mTimer;
@@ -122,6 +124,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			}
 			username = qtPrefs.getStringValue("username");
 			password = qtPrefs.getStringValue("password");
+			trim_username = qtPrefs.getStringValue("trim.username");
+			trim_password = qtPrefs.getStringValue("trim.password")
 			pingfmKey = qtPrefs.getStringValue("pingfmkey");
 			preset1 = qtPrefs.getStringValue("preset1");
 			if (preset1==null || "".equals(preset1)) { preset1 = "Wakeup"; }
