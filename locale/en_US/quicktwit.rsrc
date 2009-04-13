@@ -25,6 +25,7 @@ bitmap ID_EGG "{base}ID_EGG.png"
 string kRsrc_dialogTitle "What are you doing?"
 string kRsrc_twitterTitle "Configure twitter"
 string kRsrc_pfmKeyTitle "Configure ping.fm"
+string kRsrc_trimTitle "Configure tr.im"
 string kRsrc_presetTitle "Edit Presets"
 string kRsrc_errorTitle "quickTwit Error"
 string kRsrc_postButton "Post"
@@ -180,6 +181,37 @@ textInputAlert ID_PINGFM_LOGIN
 		position = top
 		title = kRsrc_appKeyLabel
 		id = ID_PINGFM_KEY
+endTextInputAlert
+
+#
+## tr.im Configuration
+#
+textInputAlert ID_TRIM_LOGIN
+	title = kRsrc_trimTitle
+	icon = noteIcon
+	systemDialog
+	button
+		position = buttonBottom1
+		event = EVENT_STORE_TRIM_LOGIN
+		title = kRsrc_doneButton
+		shortcut = backButton
+		id = ID_STORE_BUTTON
+		defaultButton
+	button
+		position = buttonTop1
+		title = kRsrc_cancelButton
+		event = EVENT_CANCEL
+		id = ID_CANCEL_BUTTON
+		shortcut = cancelButton
+	textField
+		position = top
+		title = kRsrc_userLabel
+		id = ID_TRIM_USERNAME
+	textField
+		position = top
+		title = kRsrc_passLabel
+		passwordField
+		id = ID_TRIM_PASSWORD
 endTextInputAlert
 
 #
