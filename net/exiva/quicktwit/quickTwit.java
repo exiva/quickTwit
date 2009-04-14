@@ -70,7 +70,6 @@ public class quickTwit extends Application implements Resources, Commands {
 	static private String username;
 	static private Timer mTimer;
 	
-	// DialogWindow quickTwit;
 	AlertWindow chooser, error, pictureWarning;
 	Button twitPic;
 	MarqueeAlert mPingMarquee, mTwitterMarquee, mTrimMarquee;
@@ -82,7 +81,6 @@ public class quickTwit extends Application implements Resources, Commands {
 		Registrar.registerProvider("quickTwit", this, 0);
 		Registrar.registerProvider("send-via", this, 1, Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE), "quickTwit", 'T');
 		quickTwit = Application.getCurrentApp().getResources().getTextInputAlert(ID_QUICKTWIT, this);
-		// quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
 		login = Application.getCurrentApp().getResources().getTextInputAlert(ID_TWITTER_LOGIN, this);
 		pingfm = Application.getCurrentApp().getResources().getTextInputAlert(ID_PINGFM_LOGIN, this);
 		trim = Application.getCurrentApp().getResources().getTextInputAlert(ID_TRIM_LOGIN, this);
@@ -102,7 +100,6 @@ public class quickTwit extends Application implements Resources, Commands {
 		presetField1 = (TextField)presets.getDescendantWithID(ID_MESSAGE_1);
 		presetField2 = (TextField)presets.getDescendantWithID(ID_MESSAGE_2);
 		presetField3 = (TextField)presets.getDescendantWithID(ID_MESSAGE_3);
-		// twitButton = (Button)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
 		twitPic = (Button)quickTwit.getDescendantWithID(ID_PHOTO_BUTTON);
 		mTimer = new Timer(2000, true, this, 1);
 		// ((TextField)presets.getDescendantWithID(ID_MESSAGE_1)).setSpellCheckEnabled(true);
@@ -307,7 +304,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	public void sendTwitABit() {
 		HTTPConnection.post("http://api.switchabit.com/twitter.updateStatus", "Authorization: Basic "+twitterLogin, "status="+msg, (short) 0, 5);
 	}
-	
+
 	public void sendFacebook(String message) {
 		message=encodeMsg(message,1);
 		HTTPConnection.post("http://static.tmblr.us/hiptop/pfm.user.post.php", "Content-Type: application/x-www-form-urlencoded","api_key="+apiKey+"&user_app_key="+pingfmKey+"&post_method=status&body="+message+"&service=facebook", (short) 0, 2);
@@ -328,15 +325,15 @@ public class quickTwit extends Application implements Resources, Commands {
 		message=encodeMsg(message,0);
 		HTTPConnection.post("http://static.tmblr.us/hiptop/pfm.user.post.php", "Content-Type: application/x-www-form-urlencoded","api_key="+apiKey+"&user_app_key="+pingfmKey+"&post_method=status&body="+message+"&service=brightkite", (short) 0, 2);
 	}
-	
+
 	public void getPingKey(String inKey) {
 		HTTPConnection.post("http://static.tmblr.us/hiptop/pfm.user.key.php", "Content-Type: application/x-www-form-urlencoded","api_key="+apiKey+"&mobile_key="+inKey, (short) 0, 5);
 	}
-	
+
 	public void tweetShrink(String message) {
 		HTTPConnection.post("http://tweetshrink.com/shrink", "Authorization: Basic", "text="+message, (short) 0, 6);
 	}
-	
+
 	public void trimURL(String url) {
 		if ((trim_username == null) || (trim_password == null)) {
 			HTTPConnection.post("http://api.tr.im/api/trim_simple", "Authorization: Basic", "url="+url, (short) 0, 7);
@@ -344,7 +341,7 @@ public class quickTwit extends Application implements Resources, Commands {
 			HTTPConnection.post("http://api.tr.im/api/trim_simple", "Authorization: Basic", "url="+url+"&username="+trim_username+"&password="+trim_password, (short) 0, 7);
 		}
 	}
-	
+
 	public void auth(String auuser, String aupass) {
 		twitterLogin = Base64.encode((auuser+":"+aupass).getBytes());
 		HTTPConnection.get("https://"+baseURL+"/account/verify_credentials.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", (short) 0, 3);
@@ -387,7 +384,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		qtPrefs.setStringValue("pingfmkey", key);
 		pingfmKey = key;
 	}
-	
+
 	public void storePresetMessages(String msg1, String msg2, String msg3) {
 		if (!msg1.equals(preset1)) {
 			qtPrefs.setStringValue("preset1", msg1);
@@ -413,7 +410,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	public void focus() {
 		quickTwit.setFocusedDescendant(bodyField);
 	}
-	
+
 	public void setPresets(String preset1, String preset2, String preset3) {
 		presetField1.setText(preset1);
 		presetField2.setText(preset2);
@@ -429,7 +426,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		trimUsernameField.setText(trimName);
 		trimPasswordField.setText(trimPassword);
 	}
-	
+
 	public void parsePostResponse(String response) { 
 		StringReader sr = new StringReader(response);
 		KXmlParser xpp = new KXmlParser();
