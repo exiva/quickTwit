@@ -74,7 +74,8 @@ public class quickTwit extends Application implements Resources, Commands {
 	AlertWindow chooser, error, pictureWarning;
 	Button twitPic;
 	MarqueeAlert mPingMarquee, mTwitterMarquee, mTrimMarquee;
-	TextField bodyField;
+	TextField bodyField, usernameField, passwordField, pfmField, trimUsernameField;
+	TextField trimPasswordField, presetField1, presetField2, presetField3;
 	TextInputAlertWindow login,pingfm,presets,quickTwit,trim;
 
 	public quickTwit() {
@@ -93,6 +94,14 @@ public class quickTwit extends Application implements Resources, Commands {
 		mPingMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_PING_MARQUEE),1);
 		mTrimMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_TRIM_MARQUEE),1);
 		bodyField = (TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
+		usernameField = (TextField)login.getDescendantWithID(ID_TWITTER_USERNAME);
+		passwordField = (TextField)login.getDescendantWithID(ID_TWITTER_PASSWORD);
+		pfmField = (TextField)pingfm.getDescendantWithID(ID_PINGFM_KEY);
+		trimUsernameField = (TextField)trim.getDescendantWithID(ID_TRIM_USERNAME);
+		trimPasswordField = (TextField)trim.getDescendantWithID(ID_TRIM_PASSWORD);
+		presetField1 = (TextField)presets.getDescendantWithID(ID_MESSAGE_1);
+		presetField2 = (TextField)presets.getDescendantWithID(ID_MESSAGE_2);
+		presetField3 = (TextField)presets.getDescendantWithID(ID_MESSAGE_3);
 		// twitButton = (Button)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
 		twitPic = (Button)quickTwit.getDescendantWithID(ID_PHOTO_BUTTON);
 		mTimer = new Timer(2000, true, this, 1);
@@ -106,7 +115,6 @@ public class quickTwit extends Application implements Resources, Commands {
 		IPCMessage ipc = new IPCMessage();
 		ipc.addItem("action" , "send");
 		registerForLeftShoulderHeld("quickTwit", ipc , 99);
-		setPresets(preset1, preset2, preset3);
 		restoreData();
 		// updateFollowers();
 		callHome();
@@ -135,6 +143,9 @@ public class quickTwit extends Application implements Resources, Commands {
 			if (preset2==null || "".equals(preset2)) { preset2 = "Lunch"; }
 			preset3 = qtPrefs.getStringValue("preset3");
 			if (preset3==null || "".equals(preset3)) { preset3 = "Goodnight"; }
+			setPresets(preset1, preset2, preset3);
+			setTwitterLogin(username, password);
+			setTrimLogin(trim_username, trim_password);
 			iMarquee = 1;
 			mSound = 1;
 			try {
@@ -404,11 +415,21 @@ public class quickTwit extends Application implements Resources, Commands {
 	}
 	
 	public void setPresets(String preset1, String preset2, String preset3) {
-		((TextField)presets.getDescendantWithID(ID_MESSAGE_1)).setText(preset1);
-		((TextField)presets.getDescendantWithID(ID_MESSAGE_2)).setText(preset2);
-		((TextField)presets.getDescendantWithID(ID_MESSAGE_3)).setText(preset3);
+		presetField1.setText(preset1);
+		presetField2.setText(preset2);
+		presetField3.setText(preset3);
 	}
 
+	public void setTwitterLogin(String username, String password) {
+		usernameField.setText(username);
+		passwordField.setText(password);
+	}
+	
+	public void setTrimLogin(String trimName, String trimPassword) {
+		trimUsernameField.setText(trimName);
+		trimPasswordField.setText(trimPassword);
+	}
+	
 	public void parsePostResponse(String response) { 
 		StringReader sr = new StringReader(response);
 		KXmlParser xpp = new KXmlParser();
@@ -605,24 +626,24 @@ public class quickTwit extends Application implements Resources, Commands {
 				return true;
 			}
 			case EVENT_STORE_TWITTER_LOGIN: {
-				username = login.getTextFieldValue((IPCMessage) e.argument, ID_TWITTER_USERNAME);
-				password = login.getTextFieldValue((IPCMessage) e.argument, ID_TWITTER_PASSWORD);
-				auth(login.getTextFieldValue((IPCMessage) e.argument, ID_TWITTER_USERNAME), login.getTextFieldValue((IPCMessage) e.argument, ID_TWITTER_PASSWORD));
+				username = usernameField.getText();
+				password = passwordField.getText();
+				auth(usernameField.getText(), passwordField.getText());
 				return true;
 			}
 			case EVENT_STORE_TRIM_LOGIN: {
-				trim_username = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_USERNAME);
-				trim_password = login.getTextFieldValue((IPCMessage) e.argument, ID_TRIM_PASSWORD);
+				trim_username = trimUsernameField.getText();
+				trim_password = trimPasswordField.getText();
 				qtPrefs.setStringValue("trimusername", trim_username);
 				qtPrefs.setStringValue("trimpassword", trim_password);
 				return true;
 			}
 			case EVENT_STORE_PINGFM_KEY: {
-				getPingKey(pingfm.getTextFieldValue((IPCMessage) e.argument, ID_PINGFM_KEY));
+				getPingKey(pfmField.getText());
 				return true;
 			}
 			case EVENT_STORE_PRESETS: {
-				storePresetMessages(presets.getTextFieldValue((IPCMessage) e.argument, ID_MESSAGE_1), presets.getTextFieldValue((IPCMessage) e.argument, ID_MESSAGE_2), presets.getTextFieldValue((IPCMessage) e.argument, ID_MESSAGE_3));
+				storePresetMessages(presetField1.getText(), presetField2.getText(), presetField3.getText());
 				return true;
 			}
 			case EVENT_TWITPIC: {
@@ -807,9 +828,9 @@ public class quickTwit extends Application implements Resources, Commands {
 					if (!"".equals(qt.getResponse())) { 
 						String[] trimmd = qt.getString().split("\n");
 						if ("".equals(bodyField.getText())) {
-							((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(trimmd[0]);
+							bodyField.setText(trimmd[0]);
 						} else {
-							((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(bodyField.getText()+" "+trimmd[0]);
+							bodyField.setText(bodyField.getText()+" "+trimmd[0]);
 						}
 						mTrimMarquee.setText(getString(ID_TRIMD));
 						NotificationManager.marqueeAlertNotify(mTrimMarquee);
