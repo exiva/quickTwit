@@ -601,7 +601,7 @@ public class quickTwit extends Application implements Resources, Commands {
 					}
 				}
 			case EVENT_SEND_TWITTER: {
-				handleTwitter(quickTwit.getTextFieldValue((IPCMessage) e.argument, ID_TWIT_TEXT));
+				handleTwitter(bodyField.getText());
 				return true;
 			}
 			case EVENT_STORE_TWITTER_LOGIN: {
@@ -626,22 +626,22 @@ public class quickTwit extends Application implements Resources, Commands {
 				return true;
 			}
 			case EVENT_TWITPIC: {
-				if ("".equals(quickTwit.getTextFieldValue((IPCMessage) e.argument, ID_TWIT_TEXT).toString())) {
+				if ("".equals(bodyField.getText().toString())) {
 					pictureWarning.show();
 					msg = "";
 				} else {
 					chooser.show();
-					msg = quickTwit.getTextFieldValue((IPCMessage) e.argument, ID_TWIT_TEXT).toString();
+					msg = bodyField.getText().toString();
 				}
 				return true;
 			}
 			case EVENT_SHRINK: {
-				if ("".equals(quickTwit.getTextFieldValue((IPCMessage) e.argument, ID_TWIT_TEXT).toString())) {
+				if ("".equals(bodyField.getText().toString())) {
 					error.show();
 				} else {
 					mTwitterMarquee.setText("Shrinking tweet...");
 					NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-					tweetShrink(quickTwit.getTextFieldValue((IPCMessage) e.argument, ID_TWIT_TEXT).toString());
+					tweetShrink(bodyField.getText().toString());
 				}
 				return true;
 			}
