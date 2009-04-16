@@ -8,7 +8,7 @@ events "{source}net/exiva/quicktwit/Commands.java"
 #
 string ID_APP_NAME "quickTwit"
 string ID_APP_CLASS "net.exiva.quicktwit.quickTwit"
-string ID_APP_FLAGS "LC"
+string ID_APP_FLAGS "L"
 string ID_LOCALE "en_US"
 
 #
@@ -89,6 +89,10 @@ string ID_TRIMD "URL Tr.immed."
 # 		id = ID_TWIT_TEXT
 # endDialog
 
+#
+## Events
+#
+event EVENT_HANDLE_PHOTOS
 
 #
 ## quickTwit dialog
@@ -104,6 +108,12 @@ textInputAlert ID_QUICKTWIT
 		title = kRsrc_postButton
 		shortcut = backButton
 		id = ID_POST_BUTTON
+	button
+		position = buttonTop1
+		event = EVENT_CANCEL
+		title = "Cancel"
+		shortcut = cancelButton
+		id = ID_CANCEL_BUTTON
 	button
 		position = buttonBottom2
 		event = EVENT_SHRINK
