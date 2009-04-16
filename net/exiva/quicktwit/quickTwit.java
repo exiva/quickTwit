@@ -519,15 +519,16 @@ public class quickTwit extends Application implements Resources, Commands {
 		}
 
 	public void sendTwitPic(String data, int camera) {
-		IPCMessage msg = new IPCMessage();
-		msg.addItem("message", data);
-		msg.addItem("username", username);
-		msg.addItem("password", password);
-		msg.addItem("source", "quickTwit");
-		msg.addItem("camera", camera);
-		Registrar.sendMessage("TwitPicPlugin", msg, null);
-		Bundle twitpic = Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin");
-		Registrar.bringToForeground(twitpic);		
+		// IPCMessage msg = new IPCMessage();
+		// msg.addItem("message", data);
+		// msg.addItem("username", username);
+		// msg.addItem("password", password);
+		// msg.addItem("source", "quickTwit");
+		// msg.addItem("camera", camera);
+		// Registrar.sendMessage("TwitPicPlugin", msg, null);
+		// Bundle twitpic = Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin");
+		// Registrar.bringToForeground(twitpic);		
+		twitpic.showPhotoPicker();
 		clearText();
 	}
 
@@ -604,11 +605,11 @@ public class quickTwit extends Application implements Resources, Commands {
 						if ((username == null) || (password == null)) {
 							login.show();
 						} else {
-							if (Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin")==null) {
-								twitPic.disable();
-							} else {
+							// if (Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin")==null) {
+								// twitPic.disable();
+							// } else {
 								twitPic.enable();
-							}
+							// }
 							quickTwit.show();
 						}
 						return true;
