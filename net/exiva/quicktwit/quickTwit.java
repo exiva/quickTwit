@@ -31,6 +31,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
+//This is just for the logfile debugging
+import danger.storage.MountPoint;
+import danger.storage.StorageManager;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.util.Date;
+import danger.util.format.DateFormat;
+
 // import java.util.Vector;
 import danger.util.DEBUG;
 import danger.util.MetaStrings;
@@ -69,6 +77,10 @@ public class quickTwit extends Application implements Resources, Commands {
 	static private String twitterLogin;
 	static private String username;
 	static private Timer mTimer;
+	
+	//DEBUGGING
+	public static Date date;
+	public static String sDate;
 	
 	AlertWindow chooser, error, pictureWarning;
 	Button twitPic;
@@ -586,6 +598,29 @@ public class quickTwit extends Application implements Resources, Commands {
 				break;
 			}
 	}
+	
+	public void writeLog(int seq, int res, String msg, String hdrs) {
+		String[] storage;
+		storage = StorageManager.getRemovablePaths();
+		if(storage.length > 0) {
+			try {
+				FileWriter fstream = new FileWriter(storage[0]+"/quickTwit.log",true);
+				BufferedWriter out = new BufferedWriter(fstream);
+				date = new Date();
+				sDate = DateFormat.withFormat("MM.dd.yyyy hh:mm:ss", date);
+				out.write("==============================\n");
+				out.write("Time: "+sDate+"\n");
+				out.write("Sequence ID: "+seq+"\n");
+				out.write("Response Code: "+res+"\n");
+				out.write("Response Message: "+msg+"\n");
+				out.write("Response Headers: "+hdrs+"\n");
+				out.write("==============================\n\n");
+				out.close();
+			} catch (Exception e) {
+				DEBUG.p("File Write exceptioned! "+e);
+			}
+		}
+	}
 
 	public boolean receiveEvent(Event e) {
 		switch (e.type) {
@@ -726,6 +761,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	public void networkEvent(Object object) {
 		if (object instanceof HTTPTransaction) {
 			HTTPTransaction qt = (HTTPTransaction) object;
+			writeLog(qt.getSequenceID(), qt.getResponse(), qt.getResponseMessage(), qt.getHTTPHeaders());
 			if (qt.getSequenceID() == 1) {
 				if(qt.getResponse() == 200) {
 					clearText();
