@@ -15,10 +15,10 @@ string ID_LOCALE "en_US"
 ## Images
 #
 bitmap ID_MARQUEE "{base}ID_MARQUEE.png"
+bitmap ID_APP "{base}ID_APP.png"
 bitmap ID_PING_MARQUEE "{base}ID_PINGFM_MARQUEE.png"
 bitmap ID_TRIM_MARQUEE "{base}ID_TRIM.png"
 bitmap ID_TWITPIC_ICON "{base}ID_TWITPIC.png"
-bitmap ID_EGG "{base}ID_EGG.png"
 
 #
 ## Text Strings
@@ -47,15 +47,14 @@ string ID_TWITTER_DOWN "Twitter's down. Try again later."
 string ID_QUEUED "Message queued."
 string ID_TRIMD "URL Tr.immed."
 
-# #
-# ## quickTwit dialog
-# #
+#
+## quickTwit dialog
+#
 # dialog ID_QUICKTWIT
 # 	title = kRsrc_dialogTitle
 # 	systemDialog
 # 	# icon = ID_MARQUEE
 # 	widthPct = 90
-# 	# overrideMaxWidth
 # 	button
 # 		position = buttonTop1
 # 		event = EVENT_CANCEL
@@ -89,14 +88,13 @@ string ID_TRIMD "URL Tr.immed."
 # 		id = ID_TWIT_TEXT
 # endDialog
 
-
 #
 ## quickTwit dialog
 #
 textInputAlert ID_QUICKTWIT
 	title = kRsrc_dialogTitle
 	systemDialog
-	icon = ID_MARQUEE
+	icon = ID_APP
 	overrideMaxWidth
 	button
 		position = buttonBottom1
@@ -123,138 +121,115 @@ textInputAlert ID_QUICKTWIT
 endTextInputAlert
 
 #
-## twitter Configuration
+## Settings Dialog
 #
-textInputAlert ID_TWITTER_LOGIN
-	title = kRsrc_twitterTitle
-	icon = noteIcon
+dialog ID_SETTINGS
+	title = "quickTwit Settings"
+	showCancel
+	doneEvent = EVENT_SETTINGS_DONE
+	doneIsDefault
 	systemDialog
-	button
-		position = buttonBottom1
-		event = EVENT_STORE_TWITTER_LOGIN
-		title = kRsrc_doneButton
-		shortcut = backButton
-		id = ID_STORE_BUTTON
-		defaultButton
-	button
-		position = buttonTop1
-		title = kRsrc_cancelButton
-		event = EVENT_CANCEL
-		id = ID_CANCEL_BUTTON
-		shortcut = cancelButton
-	textField
-		position = top
-		title = kRsrc_userLabel
-		id = ID_TWITTER_USERNAME
-	textField
-		position = top
-		title = kRsrc_passLabel
-		passwordField
-		id = ID_TWITTER_PASSWORD
-endTextInputAlert
-
-#
-## ping.fm Configuration
-#
-textInputAlert ID_PINGFM_LOGIN
-	title = kRsrc_pfmKeyTitle
-	icon = noteIcon
-	systemDialog
-	button
-		position = buttonBottom1
-		event = EVENT_STORE_PINGFM_KEY
-		title = kRsrc_doneButton
-		shortcut = backButton
-		id = ID_STORE_BUTTON
-		defaultButton
-	button
-		position = buttonBottom3
-		event = EVENT_OPEN_KEY_PAGE
-		title = "Get Key"
-		id = ID_KEY_BUTTON
-	button
-		position = buttonTop1
-		title = kRsrc_cancelButton
-		event = EVENT_CANCEL
-		id = ID_CANCEL_BUTTON
-		shortcut = cancelButton
-	
-	textField
-		position = top
-		title = kRsrc_appKeyLabel
-		id = ID_PINGFM_KEY
-endTextInputAlert
-
-#
-## tr.im Configuration
-#
-textInputAlert ID_TRIM_LOGIN
-	title = kRsrc_trimTitle
-	icon = noteIcon
-	systemDialog
-	button
-		position = buttonBottom1
-		event = EVENT_STORE_TRIM_LOGIN
-		title = kRsrc_doneButton
-		shortcut = backButton
-		id = ID_STORE_BUTTON
-		defaultButton
-	button
-		position = buttonTop1
-		title = kRsrc_cancelButton
-		event = EVENT_CANCEL
-		id = ID_CANCEL_BUTTON
-		shortcut = cancelButton
-	textField
-		position = top
-		title = kRsrc_userLabel
-		id = ID_TRIM_USERNAME
-	textField
-		position = top
-		title = kRsrc_passLabel
-		passwordField
-		id = ID_TRIM_PASSWORD
-endTextInputAlert
-
-#
-## Preset Messages Dialog
-#
-textInputAlert ID_PRESETS
-	title = kRsrc_presetTitle
-	icon = noteIcon
-	systemDialog
-	button 			
-		position = buttonBottom1
-		event = EVENT_STORE_PRESETS
-		title = kRsrc_doneButton
-		shortcut = backButton
-		id = ID_STORE_PRESETS
-		defaultButton
-	button
-		position = buttonTop1
-		title = kRsrc_cancelButton
-		event = EVENT_CANCEL
-		id = ID_CANCEL_BUTTON
-		shortcut = cancelButton
- 	textField		
-		position = top
-		title = kRsrc_preset1Label
-		maxLength = 140
-		autoText
-		id = ID_MESSAGE_1
-	textField		
-		position = top
-		title = kRsrc_preset2Label
-		maxLength = 140
-		autoText
-		id = ID_MESSAGE_2
-	textField		
-		position = top
-		title = kRsrc_preset3Label
-		maxLength = 140
-		autoText
-		id = ID_MESSAGE_3
-endTextInputAlert
+	center
+	heightPct = 90
+	widthPct = 70
+	scrollView
+	alignWithParentLeft = 0
+	alignWithParentTop = 0
+	heightPct = 100
+	widthPct = 100
+		staticText
+			id = LBL_USERNAME
+			text = "Twitter Username"
+			alignWithParentTop = 5
+			alignWithParentLeft = 5
+			transparent
+		textField
+			id = ID_TWITTER_USERNAME
+			positionToRight = LBL_USERNAME : 5
+			fillToRight = 5
+			initialFocus
+		textField
+			id = ID_TWITTER_PASSWORD
+			positionBelow = ID_TWITTER_USERNAME : 5
+			fillToRight = 5
+			passwordField
+		staticText
+			id = LBL_PASSWORD
+			text = "Twitter Password"
+			positionToLeft = ID_TWITTER_PASSWORD : 5
+			transparent
+		textField
+			id = ID_PING_KEY
+			positionBelow = ID_TWITTER_PASSWORD : 5
+			fillToRight = 5
+		staticText
+			id = LBL_PFM
+			text = "Ping.fm Key:"
+			positionToLeft = ID_PING_KEY : 5
+			transparent
+		button
+			event = EVENT_OPEN_KEY_PAGE
+			id = ID_KEY_BUTTON
+			positionBelow = ID_PING_KEY : 5
+			title = "Get Key"
+		textField
+			id = ID_TRIM_USERNAME
+			positionBelow = ID_KEY_BUTTON : 5
+			fillToRight = 5
+		staticText
+			id = LBL_TRMUSER
+			text = "Tr.im User:"
+			positionToLeft = ID_TRIM_USERNAME : 5
+			transparent
+		textField
+			id = ID_TRIM_PASSWORD
+			positionBelow = ID_TRIM_USERNAME : 5
+			fillToRight = 5
+			passwordField
+		staticText
+			id = LBL_TRMPASSWD
+			text = "Tr.im Password:"
+			positionToLeft = ID_TRIM_PASSWORD : 5
+			transparent
+		textField
+			id = ID_MESSAGE_1
+			positionBelow = ID_TRIM_PASSWORD : 5
+			fillToRight = 5
+		staticText
+			id = LBL_PST1
+			text = "Preset 1:"
+			positionToLeft = ID_MESSAGE_1 : 5
+			transparent
+		textField
+			id = ID_MESSAGE_2
+			positionBelow = ID_MESSAGE_1 : 5
+			fillToRight = 5
+		staticText
+			id = LBL_PST2
+			text = "Preset 2:"
+			positionToLeft = ID_MESSAGE_2 : 5
+			transparent
+		textField
+			id = ID_MESSAGE_3
+			positionBelow = ID_MESSAGE_2 : 5
+			fillToRight = 5
+		staticText
+			id = LBL_PST3
+			text = "Preset 3:"
+			positionToLeft = ID_MESSAGE_3 : 5
+			transparent
+		checkBox
+			id = ID_FACEBOOK_PREFIX
+			title = "Facebook Prefix?"
+			description = "This will put \"is\" infront of your Facebook updates via Ping.FM"
+			positionBelow = ID_MESSAGE_3 : 5
+		checkBox
+			id = ID_TWITPIC_RESIZE
+			title = "Resize twitpic images?"
+			description = "This will resize the images you post on twitpic, making them upload faster and use less battery."
+			positionBelow = ID_FACEBOOK_PREFIX : 5
+	endScrollView
+endDialog
 
 #
 ## Image Chooser type Alert
@@ -289,7 +264,7 @@ alert warningAlert
 	title = "Send TwitPic?"
 	icon = stopIcon
 	systemDialog
-	text = "Send this TwitPic without text?\nThe photo will not be posted to your twitter timeline."
+	text = "Send this TwitPic without text?\nAs soon as the photo is uploaded, quickTwit will return for you to post to your timeline."
 	button
 		position = buttonBottom1
 		title = "Back"
@@ -312,3 +287,4 @@ alert ID_TWITTER_ERROR
 	sleepScreenMessage = kRsrc_errorText
 	text = kRsrc_errorText
 endAlert
+
