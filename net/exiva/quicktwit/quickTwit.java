@@ -20,6 +20,7 @@ import danger.net.HTTPConnection;
 import danger.net.HTTPTransaction;
 
 import danger.ui.AlertWindow;
+import danger.ui.CheckBox;
 import danger.ui.DialogWindow;
 import danger.ui.MarqueeAlert;
 import danger.ui.NotificationManager;
@@ -48,19 +49,17 @@ import java.net.URLEncoder;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-// import org.json.JSONArray;
-// import org.json.JSONObject;
-// import org.json.JSONException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 public class quickTwit extends Application implements Resources, Commands {
 	static private Boolean loggedin = false;
 	static private int callHome;
-	static private int iMarquee;
 	static private int mPrefix;
-	static private int mSound;
+	static private int mResize;
 	static private SettingsDB qtPrefs;
 	static private String apiKey = "e61e57a5e0ac975724e55a9f27c65178";
-	static private String baseURL;
 	static private String msg;
 	static private String password;
 	static private String pingfmKey;
@@ -84,40 +83,45 @@ public class quickTwit extends Application implements Resources, Commands {
 	
 	AlertWindow chooser, error, pictureWarning;
 	Button twitPic;
+	CheckBox facebookPrefix, twitpicResize;
 	MarqueeAlert mPingMarquee, mTwitterMarquee, mTrimMarquee;
 	TextField bodyField, usernameField, passwordField, pfmField, trimUsernameField;
 	TextField trimPasswordField, presetField1, presetField2, presetField3;
-	TextInputAlertWindow login,pingfm,presets,quickTwit,trim;
+	TextInputAlertWindow quickTwit;
 
+	// DialogWindow quickTwit;
+	DialogWindow settings;
+	
 	public quickTwit() {
 		Registrar.registerProvider("quickTwit", this, 0);
 		Registrar.registerProvider("send-via", this, 1, Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE), "quickTwit", 'T');
+		Registrar.registerProvider("qtURL", this, 2);
 		quickTwit = Application.getCurrentApp().getResources().getTextInputAlert(ID_QUICKTWIT, this);
-		login = Application.getCurrentApp().getResources().getTextInputAlert(ID_TWITTER_LOGIN, this);
-		pingfm = Application.getCurrentApp().getResources().getTextInputAlert(ID_PINGFM_LOGIN, this);
-		trim = Application.getCurrentApp().getResources().getTextInputAlert(ID_TRIM_LOGIN, this);
+		// quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
+		settings = Application.getCurrentApp().getResources().getDialog(ID_SETTINGS, this);
 		error = Application.getCurrentApp().getResources().getAlert(ID_TWITTER_ERROR, this);
 		chooser = Application.getCurrentApp().getResources().getAlert(chooserAlert, this);
 		pictureWarning = Application.getCurrentApp().getResources().getAlert(warningAlert, this);
-		presets = Application.getCurrentApp().getResources().getTextInputAlert(ID_PRESETS, this);
 		mTwitterMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE),1);
 		mPingMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_PING_MARQUEE),1);
 		mTrimMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_TRIM_MARQUEE),1);
 		bodyField = (TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
-		usernameField = (TextField)login.getDescendantWithID(ID_TWITTER_USERNAME);
-		passwordField = (TextField)login.getDescendantWithID(ID_TWITTER_PASSWORD);
-		pfmField = (TextField)pingfm.getDescendantWithID(ID_PINGFM_KEY);
-		trimUsernameField = (TextField)trim.getDescendantWithID(ID_TRIM_USERNAME);
-		trimPasswordField = (TextField)trim.getDescendantWithID(ID_TRIM_PASSWORD);
-		presetField1 = (TextField)presets.getDescendantWithID(ID_MESSAGE_1);
-		presetField2 = (TextField)presets.getDescendantWithID(ID_MESSAGE_2);
-		presetField3 = (TextField)presets.getDescendantWithID(ID_MESSAGE_3);
 		twitPic = (Button)quickTwit.getDescendantWithID(ID_PHOTO_BUTTON);
+		usernameField = (TextField)settings.getDescendantWithID(ID_TWITTER_USERNAME);
+		passwordField = (TextField)settings.getDescendantWithID(ID_TWITTER_PASSWORD);
+		pfmField = (TextField)settings.getDescendantWithID(ID_PING_KEY);
+		trimUsernameField = (TextField)settings.getDescendantWithID(ID_TRIM_USERNAME);
+		trimPasswordField = (TextField)settings.getDescendantWithID(ID_TRIM_PASSWORD);
+		presetField1 = (TextField)settings.getDescendantWithID(ID_MESSAGE_1);
+		presetField2 = (TextField)settings.getDescendantWithID(ID_MESSAGE_2);
+		presetField3 = (TextField)settings.getDescendantWithID(ID_MESSAGE_3);
+		facebookPrefix = (CheckBox)settings.getDescendantWithID(ID_FACEBOOK_PREFIX);
+		twitpicResize = (CheckBox)settings.getDescendantWithID(ID_TWITPIC_RESIZE);
 		mTimer = new Timer(2000, true, this, 1);
-		// ((TextField)presets.getDescendantWithID(ID_MESSAGE_1)).setSpellCheckEnabled(true);
-		// ((TextField)presets.getDescendantWithID(ID_MESSAGE_2)).setSpellCheckEnabled(true);
-		// ((TextField)presets.getDescendantWithID(ID_MESSAGE_3)).setSpellCheckEnabled(true);
-		// ((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setSpellCheckEnabled(true);
+		((TextField)settings.getDescendantWithID(ID_MESSAGE_1)).setSpellCheckEnabled(true);
+		((TextField)settings.getDescendantWithID(ID_MESSAGE_2)).setSpellCheckEnabled(true);
+		((TextField)settings.getDescendantWithID(ID_MESSAGE_3)).setSpellCheckEnabled(true);
+		((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setSpellCheckEnabled(true);
     }
 
 	public void launch() {
@@ -129,7 +133,9 @@ public class quickTwit extends Application implements Resources, Commands {
 		callHome();
 	}
 
-	public void resume() {}
+	// public void resume() {
+	// 	quickTwit.show();
+	// }
 
 	public void restoreData() {
 		if (SettingsDB.findDB("qtPrefs") == false) {
@@ -137,10 +143,6 @@ public class quickTwit extends Application implements Resources, Commands {
 			qtPrefs.setAutoSyncNotifyee(this);
 		} else {
 			qtPrefs = new SettingsDB("qtPrefs", true);
-			baseURL = qtPrefs.getStringValue("baseURL");
-			if (baseURL==null) {
-				baseURL="twitter.com";
-			}
 			username = qtPrefs.getStringValue("username");
 			password = qtPrefs.getStringValue("password");
 			trim_username = qtPrefs.getStringValue("trimusername");
@@ -155,16 +157,16 @@ public class quickTwit extends Application implements Resources, Commands {
 			setPresets(preset1, preset2, preset3);
 			setTwitterLogin(username, password);
 			setTrimLogin(trim_username, trim_password);
-			iMarquee = 1;
-			mSound = 1;
+			mResize = 1;
 			try {
-				iMarquee = qtPrefs.getIntValue("marquee");
-				mSound = qtPrefs.getIntValue("sound");
 				mPrefix = qtPrefs.getIntValue("prefix");
+				mResize = qtPrefs.getIntValue("resize");
 			} catch (SettingsDBException exception) {}
 			if (!loggedin) {
 				auth(username, password);
 			}
+			facebookPrefix.setValue(mPrefix);
+			twitpicResize.setValue(mResize);
 		}
 	}
 
@@ -185,80 +187,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			}
 			catch (danger.net.URLException exc) {}
 		} else if ("?CONFIGURE".equals(command)) {
-			login.show();
+			settings.show();
 			clearText();
-		} else if ("?PINGFM".equals(command)) {
-			pingfm.show();
-			clearText();
-		} else if ("?TR.IM".equals(command)) {
-			trim.show();
-			clearText();
-		} else if ("?PRESETS".equals(command)) {
-			presets.show();
-			clearText();
-		} else if (command.startsWith("?BASEURL ")) {
-			if (message.indexOf(" ")+1 <= message.length()) {
-				message = message.substring(message.indexOf(" ")+1);
-				baseURL = message;
-				qtPrefs.setStringValue("baseURL", baseURL);
-			}
-		} else if (command.startsWith("?SOUND ")) {
-			if (message.indexOf(" ")+1 <= message.length()) {
-				message = message.substring(message.indexOf(" ")+1).toUpperCase();
-				if ("ON".equals(message)) {
-					mSound=1;
-					qtPrefs.setIntValue("sound", 1);
-					clearText();
-				} else if ("OFF".equals(message)) {
-					mSound=0;
-					qtPrefs.setIntValue("sound", 0);
-					clearText();
-				}
-			}
-		} else if (command.startsWith("?MARQUEE ")) {
-			if (message.indexOf(" ")+1 <= message.length()) {
-				message = message.substring(message.indexOf(" ")+1).toUpperCase();
-				if ("ON".equals(message)) {
-					iMarquee=1;
-					qtPrefs.setIntValue("marquee", 1);
-					clearText();
-				} else if ("OFF".equals(message)) {
-					iMarquee=0;
-					qtPrefs.setIntValue("marquee", 0);
-					clearText();
-				}
-			}
-		} else if (command.startsWith("?AWESOME")) {
-			mTwitterMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_EGG),1);
-			mPingMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_EGG),1);
-			quickTwit.setBitmap(Application.getCurrentApp().getResources().getBitmap(ID_EGG));
-		} else if (command.startsWith("?UPDATES ")) {
-			if (message.indexOf(" ")+1 <= message.length()) {
-				message = message.substring(message.indexOf(" ")+1).toUpperCase();
-				if ("SMS".equals(message)) {
-					twitterSetDelivery("sms");
-					clearText();
-				} else if ("IM".equals(message)) {
-					twitterSetDelivery("im");
-					clearText();
-				} else if ("OFF".equals(message)) {
-					twitterSetDelivery("none");
-					clearText();
-				}
-			}
-		} else if (command.startsWith("?PREFIX ")) {
-			if (message.indexOf(" ")+1 <= message.length()) {
-				message = message.substring(message.indexOf(" ")+1).toUpperCase();
-				if ("ON".equals(message)) {
-					mPrefix=1;
-					qtPrefs.setIntValue("prefix", 1);
-					clearText();
-				} else if ("OFF".equals(message)) {
-					mPrefix=0;
-					qtPrefs.setIntValue("prefix", 0);
-					clearText();
-				}
-			}
 		} else if ("?1".equals(command)) {
 			if ("".equals(preset1)) {
 				error.show();
@@ -293,10 +223,6 @@ public class quickTwit extends Application implements Resources, Commands {
 				if (message.indexOf(" ")+1 <= message.length()) {
 					sendBkite(message.substring(message.indexOf(" ")+1));
 			}
-		} else if (command.startsWith("?LOCATION ")) {
-				if (message.indexOf(" ")+1 <= message.length()) {
-					twitterSetLocation(message.substring(message.indexOf(" ")+1));
-				} 
 		} else if (!"".equals(command)) {
 			sendTwitter(message);
 		} else if ("".equals(command)) {
@@ -307,7 +233,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	public void sendTwitter(String message) {
 		twitterLogin = Base64.encode((username+":"+password).getBytes());
 		msg=encodeMsg(message,0);
-		HTTPConnection.post("https://"+baseURL+"/statuses/update.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "source="+source+"&status="+msg, (short) 0, 1);
+		HTTPConnection.post("https://twitter.com/statuses/update.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "source="+source+"&status="+msg, (short) 0, 1);
 		if (message.length() == 140) {
 			mTimer.start();
 		}
@@ -325,7 +251,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	public void sendFbookTwitter(String message) {
 		message=encodeMsg(message,0);
 		HTTPConnection.post("http://static.tmblr.us/hiptop/pfm.user.post.php", "Content-Type: application/x-www-form-urlencoded","api_key="+apiKey+"&user_app_key="+pingfmKey+"&post_method=status&body="+message+"&service=facebook", (short) 0, 2);
-		HTTPConnection.post("https://"+baseURL+"/statuses/update.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "source="+source+"&status="+message, (short) 0, 1);
+		HTTPConnection.post("https://twitter.com/statuses/update.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "source="+source+"&status="+message, (short) 0, 1);
 	}
 
 	public void sendMySpace(String message) {
@@ -356,24 +282,24 @@ public class quickTwit extends Application implements Resources, Commands {
 
 	public void auth(String auuser, String aupass) {
 		twitterLogin = Base64.encode((auuser+":"+aupass).getBytes());
-		HTTPConnection.get("https://"+baseURL+"/account/verify_credentials.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", (short) 0, 3);
+		HTTPConnection.get("https://twitter.com/account/verify_credentials.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", (short) 0, 3);
 	}
 
 	// public void updateFollowers() {
 	// 	String auuser = "exiva";
 	// 	String aupass = "sap18cypress";
 	// 	twitterLogin = Base64.encode((auuser+":"+aupass).getBytes());
-	// 	// HTTPConnection.get("http://"+baseURL+"/account/verify_credentials.json", "Authorization: Basic "+twitterLogin, (short) 0, 3);
+	// 	// HTTPConnection.get("http://twitter.com/account/verify_credentials.json", "Authorization: Basic "+twitterLogin, (short) 0, 3);
 	// 	HTTPConnection.get("http://twitter.com/statuses/followers/exiva.json", "Authorization: Basic "+twitterLogin, (short) 0, 97);
 	// }
 
 	public void twitterSetLocation(String location) {
 		try { location = URLEncoder.encode(location, "UTF-8"); } catch (UnsupportedEncodingException e) { }
-		HTTPConnection.post("https://"+baseURL+"/account/update_location.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "location="+location, (short) 0, 1);
+		HTTPConnection.post("https://twitter.com/account/update_location.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "location="+location, (short) 0, 1);
 	}
 
 	public void twitterSetDelivery(String device) {
-		HTTPConnection.post("https://"+baseURL+"/account/update_delivery_device.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "device="+device, (short) 0, 1);
+		HTTPConnection.post("https://twitter.com/account/update_delivery_device.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", "device="+device, (short) 0, 1);
 	}
 
 	public String encodeMsg(String message, int prefix) {
@@ -385,11 +311,51 @@ public class quickTwit extends Application implements Resources, Commands {
 		return message;
 	}
 
-	public void storeTwitterLogin(String user, String pass) {
-		qtPrefs.setStringValue("username", user);
-		qtPrefs.setStringValue("password", pass);
-		username = user;
-		password = pass;
+	public void storeTwitterLogin(String newUser, String newPass) {
+		DEBUG.p("Storing Twitter Login");
+		if (newUser != username) { 
+			username = newUser;
+			qtPrefs.setStringValue("username", newUser);
+			DEBUG.p("twitter login saved");
+		}
+		if (newPass != password) {
+			password = newPass;
+			qtPrefs.setStringValue("password", newPass);
+			DEBUG.p("twitter password saved");
+		}
+		auth(username, password);
+	}
+
+	public void storeTrimLogin(String newTrimLogin, String newTrimPassword) {
+		DEBUG.p("Storing Tr.IM Login...");
+		if (newTrimLogin != trim_username) {
+			trim_username = trimUsernameField.getText();
+			qtPrefs.setStringValue("trimusername", trim_username);
+			DEBUG.p("tr.im username saved.");
+		}
+		if (newTrimPassword != trim_password) {
+			trim_password = trimPasswordField.getText();
+			qtPrefs.setStringValue("trimpassword", trim_password);
+			DEBUG.p("tr.im password saved.");
+		}
+	}
+	
+	public void storeFBPrefix(int newFBSetting) {
+		DEBUG.p("Storing Facebook Prefix");
+		if (newFBSetting != mPrefix) {
+			mPrefix = newFBSetting;
+			qtPrefs.setIntValue("prefix", newFBSetting);
+			DEBUG.p("Facebook prefix saved");
+		}
+	}
+
+	public void storeTPResize(int newTPSetting) {
+		DEBUG.p("Storing TwitPic Resize");
+		if (newTPSetting != mPrefix) {
+			mResize = newTPSetting;
+			qtPrefs.setIntValue("resize", newTPSetting);
+			DEBUG.p("TwitPic Resize Saved");
+		}
 	}
 
 	public void storepingfmKey(String key) {
@@ -433,7 +399,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		usernameField.setText(username);
 		passwordField.setText(password);
 	}
-	
+
 	public void setTrimLogin(String trimName, String trimPassword) {
 		trimUsernameField.setText(trimName);
 		trimPasswordField.setText(trimPassword);
@@ -455,12 +421,9 @@ public class quickTwit extends Application implements Resources, Commands {
 						postStatus = xpp.getAttributeValue(0);
 						if (postStatus.equals("OK")) {
 							clearText();
-							if (mSound==1) {
-								Meta.play(Meta.FEEDBACK_NETWORK_G);
-							} if (iMarquee==1) {
-								mPingMarquee.setText(getString(ID_PINGD));
-								NotificationManager.marqueeAlertNotify(mPingMarquee);
-							}
+							Meta.play(Meta.FEEDBACK_NETWORK_G);
+							mPingMarquee.setText(getString(ID_PINGD));
+							NotificationManager.marqueeAlertNotify(mPingMarquee);
 						}
 					}
 					eventType = xpp.next();
@@ -468,12 +431,9 @@ public class quickTwit extends Application implements Resources, Commands {
 						if (eventType == xpp.TEXT) {
 							text = xpp.getText();
 							if (tagName.equals("message")) {
-								if (mSound==1) {
-									NotificationManager.playErrorSound();
-								} if (iMarquee==1) {
-									mPingMarquee.setText(text);
-									NotificationManager.marqueeAlertNotify(mPingMarquee);
-								}
+								NotificationManager.playErrorSound();
+								mPingMarquee.setText(text);
+								NotificationManager.marqueeAlertNotify(mPingMarquee);
 							}
 						}
 					}
@@ -512,13 +472,10 @@ public class quickTwit extends Application implements Resources, Commands {
 							if (eventType == xpp.TEXT) {
 								text = xpp.getText();
 								if (tagName.equals("message")) {
-									pingfm.show();
-									if (mSound==1) {
-										NotificationManager.playErrorSound();
-									} if (iMarquee==1) {
-										mPingMarquee.setText(text);
-										NotificationManager.marqueeAlertNotify(mPingMarquee);
-									}
+									settings.show();
+									NotificationManager.playErrorSound();
+									mPingMarquee.setText(text);
+									NotificationManager.marqueeAlertNotify(mPingMarquee);
 								}
 							}
 						}
@@ -537,6 +494,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		msg.addItem("password", password);
 		msg.addItem("source", "quickTwit");
 		msg.addItem("camera", camera);
+		msg.addItem("resize", mResize);
 		Registrar.sendMessage("TwitPicPlugin", msg, null);
 		Bundle twitpic = Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin");
 		Registrar.bringToForeground(twitpic);		
@@ -577,18 +535,18 @@ public class quickTwit extends Application implements Resources, Commands {
 	// }
 
 	public void parseTweetShrink(String response) {
-		// try {
-		// 	// Parse a JSONObject without an array.
-		// 	JSONObject obj = new JSONObject(response);
-		// 	int difference = obj.getInt("difference");
-		// 	String newText = obj.getString("text");
-		// 	mTwitterMarquee.setText("Shrunk tweet by "+difference+" characters");
-		// 	NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-		// 	((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(newText);
-		// 	quickTwit.show();
-		// 	obj=null;
-		// 	newText=null;
-		// } catch (JSONException e) {}
+		try {
+			// Parse a JSONObject without an array.
+			JSONObject obj = new JSONObject(response);
+			int difference = obj.getInt("difference");
+			String newText = obj.getString("text");
+			mTwitterMarquee.setText("Shrunk tweet by "+difference+" characters");
+			NotificationManager.marqueeAlertNotify(mTwitterMarquee);
+			((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setText(newText);
+			quickTwit.show();
+			obj=null;
+			newText=null;
+		} catch (JSONException e) {}
 	}
 
 	public void handleMessage(IPCMessage ipcmessage, int i) {
@@ -596,9 +554,17 @@ public class quickTwit extends Application implements Resources, Commands {
 			case 1:
 				trimURL(ipcmessage.findString("body"));
 				break;
-			}
+			case 2:
+				if ("".equals(bodyField.getText())) {
+					bodyField.setText(ipcmessage.findString("tpurl"));
+				} else {
+					bodyField.setText(ipcmessage.findString("tpurl")+" "+bodyField.getText()+" ");
+				}
+				qtShow();
+				break;
+		}
 	}
-	
+
 	public void writeLog(int seq, int res, String msg, String hdrs) {
 		String[] storage;
 		storage = StorageManager.getRemovablePaths();
@@ -622,6 +588,19 @@ public class quickTwit extends Application implements Resources, Commands {
 		}
 	}
 
+	public void qtShow() {
+		if ((username == null) || (password == null)) {
+			settings.show();
+		} else {
+			if (Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin")==null) {
+				twitPic.disable();
+			} else {
+				twitPic.enable();
+			}
+			quickTwit.show();
+		}
+	}
+
 	public boolean receiveEvent(Event e) {
 		switch (e.type) {
 			case Event.EVENT_TIMER: {
@@ -636,19 +615,15 @@ public class quickTwit extends Application implements Resources, Commands {
 			case EventType.EVENT_MESSAGE:
 				switch(e.what) {
 					case 0: {
-						if ((username == null) || (password == null)) {
-							login.show();
-						} else {
-							if (Bundle.findByClassName("net.exiva.twitpicplugin.twitpicplugin")==null) {
-								twitPic.disable();
-							} else {
-								twitPic.enable();
-							}
-							quickTwit.show();
-						}
+						qtShow();
+						// settings.show();
 						return true;
 					}
 					case 1: {
+						handleMessage(((IPCIncoming)e.argument).getMessage(), e.what);
+						return true;
+					}
+					case 2: {
 						handleMessage(((IPCIncoming)e.argument).getMessage(), e.what);
 						return true;
 					}
@@ -657,25 +632,16 @@ public class quickTwit extends Application implements Resources, Commands {
 				handleTwitter(bodyField.getText());
 				return true;
 			}
-			case EVENT_STORE_TWITTER_LOGIN: {
-				username = usernameField.getText();
-				password = passwordField.getText();
-				auth(usernameField.getText(), passwordField.getText());
-				return true;
-			}
-			case EVENT_STORE_TRIM_LOGIN: {
-				trim_username = trimUsernameField.getText();
-				trim_password = trimPasswordField.getText();
-				qtPrefs.setStringValue("trimusername", trim_username);
-				qtPrefs.setStringValue("trimpassword", trim_password);
-				return true;
-			}
-			case EVENT_STORE_PINGFM_KEY: {
-				getPingKey(pfmField.getText());
-				return true;
-			}
-			case EVENT_STORE_PRESETS: {
-				storePresetMessages(presetField1.getText(), presetField2.getText(), presetField3.getText());
+			case EVENT_SETTINGS_DONE: {
+				storeTwitterLogin(usernameField.getText(), passwordField.getText());
+				storeTrimLogin(trimUsernameField.getText(), trimPasswordField.getText());
+				storeFBPrefix(facebookPrefix.getValue());
+				storeTPResize(twitpicResize.getValue());
+				DEBUG.p("PingFM Text: "+pfmField.getText());
+				if (!"".equals(pfmField.getText())) {
+					DEBUG.p("PingFM key entered!");
+					getPingKey(pfmField.getText());
+				}
 				return true;
 			}
 			case EVENT_TWITPIC: {
@@ -741,15 +707,6 @@ public class quickTwit extends Application implements Resources, Commands {
 				}
 				catch (danger.net.URLException exc) {}
 			}
-			case EVENT_CANCEL: {
-				// login.hide();
-				// pingfm.hide();
-				// presets.hide();
-				quickTwit.hide();
-				// quickTwit=null;
-				// quit();
-				return true;
-			}
 			case Event.EVENT_AUTO_SYNC_DONE: {
 				restoreData();
 				return true;
@@ -765,25 +722,17 @@ public class quickTwit extends Application implements Resources, Commands {
 			if (qt.getSequenceID() == 1) {
 				if(qt.getResponse() == 200) {
 					clearText();
-					if (mSound==1) {
 						Meta.play(Meta.FEEDBACK_NETWORK_G);
-					} if (iMarquee==1) {
-							mTwitterMarquee.setText(getString(ID_TWITTERED));
-							NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-					}
+						mTwitterMarquee.setText(getString(ID_TWITTERED));
+						NotificationManager.marqueeAlertNotify(mTwitterMarquee);
 				} else if (qt.getResponse() == 401) {
-					if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_AUTH_FAIL));
-						NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-					}
-					login.show();
+					mTwitterMarquee.setText(getString(ID_AUTH_FAIL));
+					NotificationManager.marqueeAlertNotify(mTwitterMarquee);
+					settings.show();
 				} else {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_TWITTER_DOWN));
-						NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-					}
+					NotificationManager.playErrorSound();
+					mTwitterMarquee.setText(getString(ID_TWITTER_DOWN));
+					NotificationManager.marqueeAlertNotify(mTwitterMarquee);
 					sendTwitABit();
 				}
 			}
@@ -791,25 +740,18 @@ public class quickTwit extends Application implements Resources, Commands {
 				if (qt.getResponse() == 200) {
 					parsePostResponse(qt.getString());
 				} else {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_FAIL));
-						NotificationManager.marqueeAlertNotify(mPingMarquee);
-					}
+					NotificationManager.playErrorSound();
+					mTwitterMarquee.setText(getString(ID_FAIL));
+					NotificationManager.marqueeAlertNotify(mPingMarquee);
 				}
 			}
 			if (qt.getSequenceID() == 3) {
 				if (qt.getResponse() != 200) {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_AUTH_FAIL));
-						NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-						login.show();
-					}
+					NotificationManager.playErrorSound();
+					mTwitterMarquee.setText(getString(ID_AUTH_FAIL));
+					NotificationManager.marqueeAlertNotify(mTwitterMarquee);
+					settings.show();
 				} else if (qt.getResponse() == 200) {
-					storeTwitterLogin(username, password);
 					twitterLogin = Base64.encode((username+":"+password).getBytes());
 					loggedin=true;
 				}
@@ -817,43 +759,31 @@ public class quickTwit extends Application implements Resources, Commands {
 			if (qt.getSequenceID() == 4) {
 				if (qt.getResponse() == 200) {
 					clearText();
-					if (mSound==1) {
-						Meta.play(Meta.FEEDBACK_NETWORK_G);
-					} if (iMarquee==1) {
-							mTwitterMarquee.setText(getString(ID_QUEUED));
-							NotificationManager.marqueeAlertNotify(mTwitterMarquee);
-					}
+					Meta.play(Meta.FEEDBACK_NETWORK_G);
+					mTwitterMarquee.setText(getString(ID_QUEUED));
+					NotificationManager.marqueeAlertNotify(mTwitterMarquee);
 				} else {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						MarqueeAlert mTwitterError = new MarqueeAlert("Something is technically wrong.", 1);
-						NotificationManager.marqueeAlertNotify(mTwitterError);
-					}
+					NotificationManager.playErrorSound();
+					MarqueeAlert mTwitterError = new MarqueeAlert("Something is technically wrong.", 1);
+					NotificationManager.marqueeAlertNotify(mTwitterError);
 				}
 			}
 			if (qt.getSequenceID() == 5) {
 				if (qt.getResponse() == 200) {
 					parseKeyResponse(qt.getString());
 				} else {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_FAIL));
-						NotificationManager.marqueeAlertNotify(mPingMarquee);
-					}
+					NotificationManager.playErrorSound();
+					mTwitterMarquee.setText(getString(ID_FAIL));
+					NotificationManager.marqueeAlertNotify(mPingMarquee);
 				}
 			}
 			if (qt.getSequenceID() == 6) {
 				if (qt.getResponse() == 200) {
 					parseTweetShrink(qt.getString());
 				} else {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_FAIL));
-						NotificationManager.marqueeAlertNotify(mPingMarquee);
-					}
+					NotificationManager.playErrorSound();
+					mTwitterMarquee.setText(getString(ID_FAIL));
+					NotificationManager.marqueeAlertNotify(mPingMarquee);
 				}
 			}
 			if (qt.getSequenceID() == 7) {
@@ -869,12 +799,9 @@ public class quickTwit extends Application implements Resources, Commands {
 						NotificationManager.marqueeAlertNotify(mTrimMarquee);
 					}
 				} else {
-					if (mSound==1) {
-						NotificationManager.playErrorSound();
-					} if (iMarquee==1) {
-						mTwitterMarquee.setText(getString(ID_FAIL));
-						NotificationManager.marqueeAlertNotify(mPingMarquee);
-					}
+					NotificationManager.playErrorSound();
+					mTrimMarquee.setText(getString(ID_FAIL));
+					NotificationManager.marqueeAlertNotify(mTrimMarquee);
 				}
 			}
 			// if (qt.getSequenceID() == 97) {
