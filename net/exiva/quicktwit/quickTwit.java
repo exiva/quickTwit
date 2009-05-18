@@ -186,7 +186,7 @@ public class quickTwit extends Application implements Resources, Commands {
 				danger.net.URL.gotoURL("http://static.tmblr.us/hiptop/qTManual.htm");
 			}
 			catch (danger.net.URLException exc) {}
-		} else if ("?CONFIGURE".equals(command)) {
+		} else if ("?CONFIGURE".equals(command) || "?SETTINGS".equals(command)) {
 			settings.show();
 			clearText();
 		} else if ("?1".equals(command)) {
@@ -215,7 +215,7 @@ public class quickTwit extends Application implements Resources, Commands {
 			if (message.indexOf(" ")+1 <= message.length()) {
 				sendMySpace(message.substring(message.indexOf(" ")+1));
 			} 
-		} else if (command.startsWith("!FACEBOOK ") || command.startsWith("!FBOOK ")) {
+		} else if (command.startsWith("!FACEBOOK ") || command.startsWith("!FB ")) {
 				if (message.indexOf(" ")+1 <= message.length()) {
 					sendFacebook(message.substring(message.indexOf(" ")+1));
 			} 
