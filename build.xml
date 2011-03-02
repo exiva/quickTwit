@@ -8,7 +8,7 @@
 
 	<!-- Blade - T-Mo US -->
 	<property name="VERSION" value="5.0"/>
-	<property name="BUILD" value="265811" />
+	<property name="BUILD" value="270115" />
 	<!-- Shuriken - T-Mo US - Post OTA -->
 	<!-- <property name="VERSION" value="4.6"/>
 	<property name="BUILD" value="231400" /> -->
@@ -32,9 +32,10 @@
 	<property name="BUILD" value="149695" /> -->
 
 	<property name="APP_VERSION_MAJOR" value="1"/>
-	<property name="APP_VERSION_MINOR" value="0"/>
+	<property name="APP_VERSION_MINOR" value="5"/>
 	<property name="APP_VERSION_BUILD" value="50"/>
 
-	<import file="${DANGER_HOME}/tools/proguard.xml"/> 
+	<!-- <import file="${DANGER_HOME}/tools/proguard.xml"/>  -->
+	<!-- <import file="${DANGER_HOME}/tools/precompile.xml"/>  -->
     <import file="${DANGER_HOME}/tools/build_common.xml"/>
 </project>

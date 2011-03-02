@@ -8,17 +8,20 @@ events "{source}net/exiva/quicktwit/Commands.java"
 #
 string ID_APP_NAME "quickTwit"
 string ID_APP_CLASS "net.exiva.quicktwit.quickTwit"
-string ID_APP_FLAGS "LC"
+string ID_APP_FLAGS "L"
 string ID_LOCALE "en_US"
 
 #
 ## Images
 #
+bitmap ID_SPLASH_SCREEN	"{base}SplashScreenTransparent.png"
+bitmap ID_LOGO "{base}logo.png"
 bitmap ID_MARQUEE "{base}ID_MARQUEE.png"
 bitmap ID_APP "{base}ID_APP.png"
 bitmap ID_PING_MARQUEE "{base}ID_PINGFM_MARQUEE.png"
 bitmap ID_TRIM_MARQUEE "{base}ID_TRIM.png"
 bitmap ID_TWITPIC_ICON "{base}ID_TWITPIC.png"
+bitmap ID_PICTURE "{base}main.png"
 
 #
 ## Text Strings
@@ -50,52 +53,17 @@ string ID_TRIMD "URL Tr.immed."
 #
 ## quickTwit dialog
 #
-# dialog ID_QUICKTWIT
-# 	title = kRsrc_dialogTitle
-# 	systemDialog
-# 	# icon = ID_MARQUEE
-# 	widthPct = 90
-# 	button
-# 		position = buttonTop1
-# 		event = EVENT_CANCEL
-# 		title = "Cancel"
-# 		shortcut = cancelButton
-# 		id = ID_CANCEL_BUTTON
-# 	button
-# 		position = buttonBottom1
-# 		event = EVENT_SEND_TWITTER
-# 		title = kRsrc_postButton
-# 		shortcut = backButton
-# 		id = ID_POST_BUTTON
-# 	button
-# 		position = buttonBottom3
-# 		event = EVENT_TWITPIC
-# 		title = "TwitPic"
-# 		shortcut = rightShoulderButton
-# 		id = ID_PHOTO_BUTTON
-# 	button
-# 		position = buttonBottom2
-# 		event = EVENT_SHRINK
-# 		title = "TweetShrink"
-# 		id = ID_SHRINK_BUTTON
-# 	textField
-# 		top = 0
-# 		left = 0
-# 		fillToRight = 0
-# 		# position = top
-# 		maxLength = 140
-# 		autoText		
-# 		id = ID_TWIT_TEXT
-# endDialog
-
-#
-## quickTwit dialog
-#
-textInputAlert ID_QUICKTWIT
+dialog ID_QUICKTWIT
 	title = kRsrc_dialogTitle
 	systemDialog
-	icon = ID_APP
-	overrideMaxWidth
+	# icon = ID_MARQUEE
+	widthPct = 90
+	button
+		position = buttonTop1
+		event = EVENT_CANCEL
+		title = "Cancel"
+		shortcut = cancelButton
+		id = ID_CANCEL_BUTTON
 	button
 		position = buttonBottom1
 		event = EVENT_SEND_TWITTER
@@ -103,22 +71,173 @@ textInputAlert ID_QUICKTWIT
 		shortcut = backButton
 		id = ID_POST_BUTTON
 	button
-		position = buttonBottom2
-		event = EVENT_SHRINK
-		title = "TweetShrink"
-		id = ID_SHRINK_BUTTON
-	button
 		position = buttonBottom3
 		event = EVENT_TWITPIC
 		title = "TwitPic"
 		shortcut = rightShoulderButton
 		id = ID_PHOTO_BUTTON
+	button
+		position = buttonBottom2
+		event = EVENT_SHRINK
+		title = "TweetShrink"
+		id = ID_SHRINK_BUTTON
+	image
+		bitmap = ID_MARQUEE
+		alignWithParentTop = 1
+		alignWithParentLeft = 1
+		id = ID_IMAGE
 	textField
-		position = top
+		positionToRight = ID_IMAGE : 2
+		fillToRight = 50
+		# position = top
 		maxLength = 140
 		autoText		
 		id = ID_TWIT_TEXT
-endTextInputAlert
+		event = EVENT_TEST
+	staticText
+		positionToRight = ID_TWIT_TEXT : 3
+		text = "140"
+		id = ID_COUNT
+endDialog
+
+#
+## quickTwit dialog
+#
+# textInputAlert ID_QUICKTWIT
+# 	title = kRsrc_dialogTitle
+# 	systemDialog
+# 	icon = ID_APP
+# 	overrideMaxWidth
+# 	button
+# 		position = buttonBottom1
+# 		event = EVENT_SEND_TWITTER
+# 		title = kRsrc_postButton
+# 		shortcut = backButton
+# 		id = ID_POST_BUTTON
+# 	button
+# 		position = buttonBottom2
+# 		event = EVENT_SHRINK
+# 		title = "TweetShrink"
+# 		id = ID_SHRINK_BUTTON
+# 	button
+# 		position = buttonBottom3
+# 		event = EVENT_TWITPIC
+# 		title = "TwitPic"
+# 		shortcut = rightShoulderButton
+# 		id = ID_PHOTO_BUTTON
+# 	textField
+# 		position = top
+# 		maxLength = 140
+# 		autoText		
+# 		id = ID_TWIT_TEXT
+# 		event = EVENT_TEST
+# endTextInputAlert
+
+#
+## Login Screen Menu
+#
+menu ID_LOGIN_MENU
+	menuItem
+		title = "Login"
+		event = EVENT_STORE_LOGIN
+		shortcut = 'l'
+	# menuItem
+	# 	title = kRsrc_setupSignUp
+	# 	event = EVENT_SIGN_UP
+	# 	shortcut = 's'
+	divider
+	menuItem
+		title = "About"
+		event = ABOUT
+endMenu
+
+#
+## Main Menu
+#
+menu ID_MAIN_MENU
+	menuItem
+		title = ""
+#
+## Login Screen
+#
+screen ID_LOGIN_SCREEN
+	title = "quickTwit"
+	className = "net.exiva.quicktwit.quickTwitLogin"
+	# icon = ID_SMALL_ICON
+	actionMenu = ID_LOGIN_MENU
+	backgroundColor = defaultPaneColor
+	image
+		id = LOGO
+		bitmap = ID_LOGO
+		alignWithParentTop = 10
+		centerHorizontally
+	roundRectContainer
+		id = ID_ROUND_CONTAINER
+		positionBelow = LOGO : 15
+		centerHorizontally
+		transparent
+		widthPct = 80
+		heightPct = 30
+		frameColor = 0x00FFFFFF
+		fillColor = defaultPaneColor
+	staticText
+		id = LBL_USERNAME
+		text = "Username"
+		@ IF {screen} = fwvga
+		alignWithParentTop = 17
+		@ ELSE
+		alignWithParentTop = 6
+		@ ENDIF
+		alignWithParentLeft = 5
+		transparent
+	textField
+		id = ID_USERNAME
+		positionToRight = LBL_USERNAME : 5
+		fillToRight = 5
+		initialFocus
+	textField
+		id = ID_PASSWORD
+		positionBelow = ID_USERNAME : 5
+		fillToRight = 5
+		passwordField
+	staticText
+		id = LBL_PASSWORD
+		text = "Password"
+		positionToLeft = ID_PASSWORD : 5
+		transparent
+	endRoundRectContainer
+	progressBar
+		initialValue = -1
+    	minValue = -1
+    	maxValue = -1
+		positionBelow = ID_ROUND_CONTAINER : 20
+		alignLeft = ID_ROUND_CONTAINER
+		width = 200
+		invisible
+		id = ID_THROBBER
+	button
+		event = EVENT_STORE_LOGIN
+		id = ID_LOGIN_BUTTON
+		positionBelow = ID_ROUND_CONTAINER : 20
+		alignRight = ID_ROUND_CONTAINER
+		title = "Login"
+endScreen
+
+#
+## Main Screen
+#
+screen ID_MAIN_SCREEN
+	title = "quickTwit"
+	className = "net.exiva.quicktwit.quickTwitLogin"
+	# icon = ID_SMALL_ICON
+	actionMenu = ID_MAIN_MENU
+	backgroundColor = defaultPaneColor
+	image
+		id = PICTURE
+		bitmap = ID_PICTURE
+		alignWithParentTop = 10
+		centerHorizontally
+endScreen
 
 #
 ## Settings Dialog
@@ -131,7 +250,7 @@ dialog ID_SETTINGS
 	systemDialog
 	center
 	heightPct = 90
-	widthPct = 70
+	widthPct = 80
 	scrollView
 	alignWithParentLeft = 0
 	alignWithParentTop = 0
@@ -256,7 +375,6 @@ alert chooserAlert
 		event = EVENT_TAKE_PHOTO
 endAlert
 
-
 #
 ## Send Image Alert
 #
@@ -288,3 +406,19 @@ alert ID_TWITTER_ERROR
 	text = kRsrc_errorText
 endAlert
 
+#
+## Splash Screen
+#
+splashScreen ID_SPLASH_SCREEN_RESOURCE
+@ IF {screen} = fwvga
+fwvgaSplashScreen
+@ ELSEIF {screen} = wqvga
+wqvgaSplashScreen
+@ ELSEIF {screen} = qvga
+qvgaSplashScreen
+@ ENDIF
+image
+	bitmap = ID_SPLASH_SCREEN
+	alignWithParentLeft = 0
+	alignWithParentTop = 0
+endSplashScreen

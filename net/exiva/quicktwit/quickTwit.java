@@ -67,7 +67,7 @@ public class quickTwit extends Application implements Resources, Commands {
 	static private String preset1;
 	static private String preset2;
 	static private String preset3;
-	static private String source = "quickTwit";
+	static private String source = "KIN";
 	static private String version = "1.0";
 	static private String tagName;
 	static private String text;
@@ -87,17 +87,21 @@ public class quickTwit extends Application implements Resources, Commands {
 	MarqueeAlert mPingMarquee, mTwitterMarquee, mTrimMarquee;
 	TextField bodyField, usernameField, passwordField, pfmField, trimUsernameField;
 	TextField trimPasswordField, presetField1, presetField2, presetField3;
-	TextInputAlertWindow quickTwit;
-
-	// DialogWindow quickTwit;
+	// TextInputAlertWindow quickTwit;
+	StaticText remaining;
+	DialogWindow quickTwit;
 	DialogWindow settings;
-	
+
+	static public quickTwitLogin mLogin;
+
 	public quickTwit() {
 		Registrar.registerProvider("quickTwit", this, 0);
 		Registrar.registerProvider("send-via", this, 1, Application.getCurrentApp().getResources().getBitmap(ID_MARQUEE), "quickTwit", 'T');
 		Registrar.registerProvider("qtURL", this, 2);
-		quickTwit = Application.getCurrentApp().getResources().getTextInputAlert(ID_QUICKTWIT, this);
-		// quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
+		mLogin = quickTwitLogin.create();
+		mTimer = new Timer(2000, true, this, 1);
+		// quickTwit = Application.getCurrentApp().getResources().getTextInputAlert(ID_QUICKTWIT, this);
+		quickTwit = Application.getCurrentApp().getResources().getDialog(ID_QUICKTWIT, this);
 		settings = Application.getCurrentApp().getResources().getDialog(ID_SETTINGS, this);
 		error = Application.getCurrentApp().getResources().getAlert(ID_TWITTER_ERROR, this);
 		chooser = Application.getCurrentApp().getResources().getAlert(chooserAlert, this);
@@ -107,6 +111,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		mTrimMarquee = new MarqueeAlert("null", Application.getCurrentApp().getResources().getBitmap(ID_TRIM_MARQUEE),1);
 		bodyField = (TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT);
 		twitPic = (Button)quickTwit.getDescendantWithID(ID_PHOTO_BUTTON);
+		remaining = (StaticText)quickTwit.getDescendantWithID(ID_COUNT);
 		usernameField = (TextField)settings.getDescendantWithID(ID_TWITTER_USERNAME);
 		passwordField = (TextField)settings.getDescendantWithID(ID_TWITTER_PASSWORD);
 		pfmField = (TextField)settings.getDescendantWithID(ID_PING_KEY);
@@ -115,13 +120,16 @@ public class quickTwit extends Application implements Resources, Commands {
 		presetField1 = (TextField)settings.getDescendantWithID(ID_MESSAGE_1);
 		presetField2 = (TextField)settings.getDescendantWithID(ID_MESSAGE_2);
 		presetField3 = (TextField)settings.getDescendantWithID(ID_MESSAGE_3);
+
 		facebookPrefix = (CheckBox)settings.getDescendantWithID(ID_FACEBOOK_PREFIX);
 		twitpicResize = (CheckBox)settings.getDescendantWithID(ID_TWITPIC_RESIZE);
-		mTimer = new Timer(2000, true, this, 1);
 		((TextField)settings.getDescendantWithID(ID_MESSAGE_1)).setSpellCheckEnabled(true);
 		((TextField)settings.getDescendantWithID(ID_MESSAGE_2)).setSpellCheckEnabled(true);
 		((TextField)settings.getDescendantWithID(ID_MESSAGE_3)).setSpellCheckEnabled(true);
 		((TextField)quickTwit.getDescendantWithID(ID_TWIT_TEXT)).setSpellCheckEnabled(true);
+		
+		
+		mLogin.show();
     }
 
 	public void launch() {
@@ -131,11 +139,25 @@ public class quickTwit extends Application implements Resources, Commands {
 		restoreData();
 		// updateFollowers();
 		callHome();
+		
+		//#if defined(poo)
+		DEBUG.p("Poo is ${poo}");
+		//#else
+		DEBUG.p("Poo is not defined");
+		//#endif
+
+		//#if ${os_version} == 4.1
+		DEBUG.p("OS 4.1");
+		//#elif defined(poo) and ${os_version} >= 4.2
+		DEBUG.p("OS 4.2 and above");
+		DEBUG.p("Ooooh; compound expressions");
+		//#endif
 	}
 
 	// public void resume() {
 	// 	quickTwit.show();
 	// }
+
 
 	public void restoreData() {
 		if (SettingsDB.findDB("qtPrefs") == false) {
@@ -155,7 +177,8 @@ public class quickTwit extends Application implements Resources, Commands {
 			preset3 = qtPrefs.getStringValue("preset3");
 			if (preset3==null || "".equals(preset3)) { preset3 = "Goodnight"; }
 			setPresets(preset1, preset2, preset3);
-			setTwitterLogin(username, password);
+			// setTwitterLogin(username, password);
+			mLogin.setLogin(username, password);
 			setTrimLogin(trim_username, trim_password);
 			mResize = 1;
 			try {
@@ -280,7 +303,7 @@ public class quickTwit extends Application implements Resources, Commands {
 		}
 	}
 
-	public void auth(String auuser, String aupass) {
+	public static void auth(String auuser, String aupass) {
 		twitterLogin = Base64.encode((auuser+":"+aupass).getBytes());
 		HTTPConnection.get("https://twitter.com/account/verify_credentials.json", "Authorization: Basic "+twitterLogin+"\nX-Twitter-Client: "+source+"\n X-Twitter-Client-URL: http://static.tmblr.us/hiptop/quickTwit.htm\n X-Twitter-Client-Version: 1.0", (short) 0, 3);
 	}
@@ -630,6 +653,11 @@ public class quickTwit extends Application implements Resources, Commands {
 				}
 			case EVENT_SEND_TWITTER: {
 				handleTwitter(bodyField.getText());
+				return true;
+			}
+			case EVENT_TEST: {
+				// int left = 140 - bodyField.length();
+				remaining.setText(Integer.toString(140 - bodyField.length()));
 				return true;
 			}
 			case EVENT_SETTINGS_DONE: {
